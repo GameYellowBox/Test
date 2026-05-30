@@ -3,14 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>页面未找到</title>
+  <title>页面未找到 | 404</title>
+  <meta name="description" content="抱歉，该页面不存在或已被移动。">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container error-page">
-    <h1>404</h1>
-    <p>抱歉，你要找的页面可能已被移动、删除或从未存在。</p>
-    <a href="index.html" class="btn">返回主页</a>
+    <div class="error-bg">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+    
+    <h1 class="error-title">404</h1>
+    <p class="error-subtitle">这个页面似乎去星际旅行了，暂时无法返回地球。</p>
+    
+    <div class="error-actions">
+      <a href="index.html" class="btn">🏠 返回主页</a>
+      <a href="blog.html" class="btn btn-outline">📖 逛逛博客</a>
+    </div>
   </div>
   <script src="script.js"></script>
 </body>
