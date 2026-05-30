@@ -92,6 +92,41 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .mermaid-container svg{max-width:100%;height:auto}
 .katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0}
 
+/* 🔍 搜索预览面板 */
+.fp{display:flex;flex-direction:column;gap:8px;padding:8px 16px;max-width:var(--max-w);margin:0 auto}
+.sp-container{background:var(--search-bg);border:1px solid var(--search-border);border-radius:12px;overflow:hidden;animation:slideIn 0.25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.sp-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(0,0,0,0.2);border-bottom:1px solid var(--search-border)}
+.sp-title{font-size:13px;font-weight:600;color:var(--accent)}
+.sp-meta{display:flex;gap:6px;font-size:11px;color:var(--text-s)}
+.sp-badge{padding:2px 6px;border-radius:4px;font-size:10px;font-weight:500}
+.sp-badge.ok{background:rgba(34,197,94,0.15);color:#22c55e}
+.sp-badge.load{background:rgba(99,102,241,0.15);color:#6366f1;animation:pulse 1.5s infinite}
+.sp-badge.err{background:rgba(239,68,68,0.15);color:#ef4444}
+.sp-list{max-height:220px;overflow-y:auto;padding:8px}
+.sp-card{display:flex;gap:10px;padding:10px;background:var(--surface);border:1px solid rgba(255,255,255,0.05);border-radius:8px;margin-bottom:6px;transition:0.2s;position:relative}
+.sp-card:hover{border-color:var(--primary)}
+.sp-card.disabled{opacity:0.5;filter:grayscale(0.8)}
+.sp-check{position:absolute;top:8px;right:8px;width:18px;height:18px;accent-color:var(--primary);cursor:pointer}
+.sp-info{flex:1;min-width:0}
+.sp-domain{font-size:10px;color:var(--text-s);margin-bottom:2px;display:flex;align-items:center;gap:4px}
+.sp-domain::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.sp-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;word-break:break-word}
+.sp-snippet{font-size:11px;color:var(--text-s);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sp-actions{display:flex;justify-content:flex-end;gap:6px;padding:6px 8px;border-top:1px solid rgba(255,255,255,0.05)}
+.sp-btn{padding:4px 10px;border-radius:6px;border:none;background:var(--surface-h);color:var(--text);cursor:pointer;font-size:11px;transition:0.2s}
+.sp-btn:hover{background:var(--primary);color:#fff}
+.sp-btn.confirm{background:var(--accent);color:#000}
+.sp-btn.confirm:hover{background:#0891b2}
+.sp-footer{padding:6px 10px;font-size:10px;color:var(--text-s);background:rgba(0,0,0,0.1);border-top:1px solid rgba(255,255,255,0.05)}
+.sp-loading{text-align:center;padding:20px;color:var(--text-s)}
+.sp-spinner{width:16px;height:16px;border:2px solid var(--text-s);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sp-empty{text-align:center;padding:16px;color:var(--text-s);font-size:12px}
+.search-citation{display:inline-block;background:var(--search-bg);border:1px solid var(--search-border);border-radius:4px;padding:1px 6px;margin:0 2px;font-size:0.85em;color:var(--accent);cursor:pointer;transition:0.2s}
+.search-citation:hover{background:var(--accent);color:#fff}
+.search-disclaimer{font-size:10px;color:var(--text-s);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.03);border-radius:4px;border-left:2px solid var(--accent)}
+
 .ia{padding:12px 16px;background:var(--surface);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,0.06)}
 .icn{max-width:var(--max-w);margin:0 auto;display:flex;gap:8px;align-items:flex-end;position:relative}
 .iw{flex:1;background:var(--surface-h);border:1px solid rgba(255,255,255,0.1);border-radius:12px;transition:0.2s;padding:4px}
@@ -217,19 +252,6 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .mxb.tts-btn.speaking { color: var(--accent); animation: soundWave 1s infinite; }
 @keyframes soundWave { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-/* 🧩 插件市场优化样式 */
-.plugin-market-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed rgba(255,255,255,0.1)}
-.plugin-grid{display:grid;gap:8px;max-height:180px;overflow-y:auto;padding-right:4px}
-.plugin-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;transition:0.2s}
-.plugin-card:hover{background:rgba(255,255,255,0.06);border-color:rgba(99,102,241,0.2)}
-.plugin-icon{width:32px;height:32px;border-radius:6px;background:var(--surface);display:grid;place-items:center;font-size:16px;flex-shrink:0}
-.plugin-info{flex:1;min-width:0}
-.plugin-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.plugin-meta{font-size:10px;color:var(--text-s);margin-top:2px}
-.plugin-del{background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;padding:4px;opacity:0.6;transition:0.2s}
-.plugin-del:hover{opacity:1;background:rgba(239,68,68,0.1);border-radius:4px}
-.plugin-empty{text-align:center;padding:16px;color:var(--text-s);font-size:12px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px dashed rgba(255,255,255,0.08)}
-
 @media(max-width:768px){
     .app{grid-template-columns:1fr}
     .sidebar{position:fixed;z-index:50;width:85%;max-width:320px;height:100%;transform:translateX(-100%)}
@@ -243,6 +265,8 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
     #userInput{font-size:16px}
     .sbtn{width:36px;height:36px}
     .cbd{padding:8px;font-size:11px}
+    .fp{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+    .sp-list{max-height:180px}
     .sidebar-toggle{display:none}
     .lib-btn{left:10px;bottom:70px;padding:6px 10px;font-size:12px}
 }
@@ -251,9 +275,38 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
     .ch{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
 }
 @media (hover:none) and (pointer:coarse) {
-    .si,.sg,.ab,.mxb,.ccp,.sp-btn,.lib-btn,.plugin-del{-webkit-tap-highlight-color:transparent}
-    .si:active,.sg:active,.ab:active,.sp-btn:active,.lib-btn:active,.plugin-del:active{transform:scale(0.98)}
+    .si,.sg,.ab,.mxb,.ccp,.search-citation,.sp-btn,.lib-btn{-webkit-tap-highlight-color:transparent}
+    .si:active,.sg:active,.ab:active,.sp-btn:active,.lib-btn:active{transform:scale(0.98)}
 }
+
+/* 📊 用量面板专属样式 & 顶级过渡动画 */
+.tc#t-usage { position: relative; }
+.tc#t-usage.act { animation: tabBlurIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes tabBlurIn {
+  0% { opacity: 0; transform: translateY(12px) scale(0.97); filter: blur(6px); }
+  70% { opacity: 1; transform: translateY(0) scale(1.01); filter: blur(0); }
+  100% { transform: scale(1); }
+}
+.u-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.u-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; position: relative; overflow: hidden; transition: 0.25s; }
+.u-card:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+.u-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background: linear-gradient(to bottom, var(--primary), var(--accent)); }
+.u-card.act { animation: cardStagger 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes cardStagger { 0% { opacity:0; transform:translateY(8px) scale(0.96); } 100% { opacity:1; transform:translateY(0) scale(1); } }
+.u-lbl { font-size:10px; color:var(--text-s); margin-bottom:4px; display:flex; align-items:center; gap:4px; }
+.u-val { font-size:20px; font-weight:700; color:var(--text); font-family:'JetBrains Mono',monospace; margin:2px 0; }
+.u-sub { font-size:9px; color:var(--text-s); } .u-sub span{color:var(--accent);font-weight:600;}
+.u-chart { height:70px; display:flex; align-items:flex-end; gap:5px; padding:8px 0; background:rgba(0,0,0,0.15); border-radius:8px; margin:10px 0; }
+.u-bar { flex:1; background:linear-gradient(to top, var(--primary), var(--accent)); border-radius:3px 3px 0 0; min-height:3px; position:relative; transition:height 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+.u-bar::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-3px); background:var(--bg); color:var(--text); padding:3px 7px; border-radius:5px; font-size:10px; white-space:nowrap; opacity:0; transition:0.2s; pointer-events:none; border:1px solid rgba(255,255,255,0.1); box-shadow:0 4px 10px rgba(0,0,0,0.3); }
+.u-bar:hover::after { opacity:1; }
+.u-cost { display:flex; align-items:center; gap:8px; background:var(--surface); padding:8px 10px; border-radius:8px; margin-top:10px; border:1px solid rgba(255,255,255,0.05); }
+.u-btns { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+.u-btn { padding:7px 12px; border-radius:7px; border:1px solid rgba(255,255,255,0.08); background:var(--surface); color:var(--text); cursor:pointer; font-size:11px; transition:0.2s; display:flex; align-items:center; gap:5px; }
+.u-btn:hover { background:var(--surface-h); border-color:var(--primary); }
+.u-btn.wn:hover { border-color:var(--err); color:var(--err); background:rgba(239,68,68,0.1); }
+.u-note { font-size:9px; color:var(--text-s); margin-top:6px; padding-left:2px; opacity:0.8; }
+.u-sec { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
 </style>
 </head>
 <body>
@@ -286,7 +339,9 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
             <div class="ca"><button class="ab" onclick="expChat()" title="导出">📥</button><button class="ab" onclick="clrCur()" title="清空">🗑️</button><button class="ab" onclick="openSet()" title="设置">⚙️</button></div>
         </header>
         <div class="msgs" id="msgs"><div class="wel" id="wel"><div class="wi">🚀</div><h2>欢迎使用 Ultra AI + Web Search</h2><p>支持实时网络搜索增强。配置搜索服务后，输入"搜索/查一下"自动获取最新信息。</p><div class="sgs"><div class="sg" onclick="qSend('搜索今天特斯拉股价')">📈 实时股价</div><div class="sg" onclick="qSend('查一下最新 AI 新闻')">📰 新闻资讯</div><div class="sg" onclick="qSend('用Python写一个异步爬虫框架')">💻 代码生成</div></div></div></div>
+        <div id="searchPreview" class="fp"></div>
         <button class="lib-btn" onclick="openLibrary()">📚 你的库</button>
+        <button class="lib-btn" style="left:16px;bottom:16px;border-color:var(--warn);color:var(--warn)" onclick="fetchAnnouncement()">📃最新公告</button>
         <div class="ia">
             <div class="icn">
                 <div class="iw"><textarea id="userInput" placeholder="输入消息... (Shift+Enter换行，输入'搜索'自动联网)" rows="1" onkeydown="hKey(event)" oninput="aRes(this)"></textarea><div class="if"><span id="cc">0 / 4000</span><span>Enter 发送</span></div></div>
@@ -300,7 +355,7 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
     <div class="md">
         <div class="mh"><h2>⚙️ 设置与自定义</h2><button class="mcl" onclick="closeSet()">✕</button></div>
         <div class="mb">
-            <div class="mtabs"><button class="mtab act" onclick="swTab('api',this)">🔑 API</button><button class="mtab" onclick="swTab('lim',this)">🛡️ 限制</button><button class="mtab" onclick="swTab('personalize',this)">🎨 个性化</button><button class="mtab" onclick="swTab('ext',this)">🧩 拓展</button><button class="mtab" onclick="swTab('test',this)">🧪 测试功能</button><button class="mtab" onclick="swTab('mod',this)">🧠 模型</button><button class="mtab" onclick="swTab('dat',this)">💾 数据</button><button class="mtab" onclick="swTab('act',this)">📜 日志</button></div>
+            <div class="mtabs"><button class="mtab act" onclick="swTab('api',this)">🔑 API</button><button class="mtab" onclick="swTab('lim',this)">🛡️ 限制</button><button class="mtab" onclick="swTab('personalize',this)">🎨 个性化</button><button class="mtab" onclick="swTab('ext',this)">🧩 拓展</button><button class="mtab" onclick="swTab('test',this)">🧪 测试功能</button><button class="mtab" onclick="swTab('mod',this)">🧠 模型</button><button class="mtab" onclick="swTab('usage',this)">📊 用量</button><button class="mtab" onclick="swTab('act',this)">📜 日志</button></div>
             <div class="tc act" id="t-api">
                 <div class="fg"><label class="fl">AI API Base URL</label><input type="text" class="fi" id="apiUrl" placeholder="https://api.openai.com/v1"></div>
                 <div class="fg"><label class="fl">AI API Key</label><input type="password" class="fi" id="apiKey" placeholder="sk-..."></div>
@@ -466,89 +521,45 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
                     </select>
                 </div>
                 <div style="font-size:11px;color:var(--text-s);margin-top:8px">💡 切换后部分界面文本将实时更新，聊天记录不受影响。</div>
-                
-                <!-- 🧩 插件市场优化 -->
-                <div style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
-                  <div class="plugin-market-header">
-                    <label class="fl" style="color:var(--accent);margin:0">🧩 插件市场</label>
-                    <button class="ab" style="width:auto;padding:4px 8px;font-size:10px" onclick="injectExamplePlugin()">📥 载入示例天气</button>
-                  </div>
-                </div>
-
-                <div class="fg">
-                  <label class="fl">🔗 安装插件 (粘贴 JSON 或 URL)</label>
-                  <textarea class="fta" id="pluginInstall" rows="3" placeholder='{"id":"...","name":"...","handler":"..."}'></textarea>
-                  <div style="display:flex;gap:8px;margin-top:6px">
-                    <button class="sbtn" style="flex:1;height:32px;border-radius:8px;font-size:12px" onclick="installPlugin()">📥 安装插件</button>
-                    <button class="sbtn" style="width:80px;height:32px;border-radius:8px;font-size:12px;background:var(--surface);color:var(--text)" onclick="clearPluginInput()">✕ 清空</button>
-                  </div>
-                </div>
-
-                <div class="fg">
-                  <label class="fl">📦 已安装插件 <span id="pluginCount" style="color:var(--text-s);font-weight:400">0</span></label>
-                  <div id="pluginGrid" class="plugin-grid"></div>
-                </div>
-
-                <div class="tr">
-                  <div><div style="font-size:13px;font-weight:500">🤖 插件自动响应</div>
-                  <div class="td2">消息匹配关键词时自动调用插件</div></div>
-                  <div class="tg act" id="tPluginAuto" onclick="this.classList.toggle('act')"></div>
-                </div>
             </div>
 
             <div class="tc" id="t-test">
                 <div style="text-align:center;padding:40px;color:var(--text-s)">暂无可用测试功能，稍后再试吧~</div>
             </div>
             
-            <div class="tc" id="t-mod">
-                <div class="fg">
-                    <label class="fl">预设模型</label>
-                    <select class="fs" id="mSel" onchange="updateModelCaps();document.getElementById('cMod').value=this.value">
-                        <option value="gpt-oss-120b:free">gpt-oss</option>
-                        <option value="z-ai/glm-4.5-air:free">glm-4.5-air</option>
-                        <option value="custom">自定义</option>
-                    </select>
-                </div>
-                <div class="fg">
-                    <label class="fl">自定义模型名</label>
-                    <input type="text" class="fi" id="cMod" placeholder="model-id" oninput="updateModelCaps()">
-                </div>
-                <div class="fg">
-                    <label class="fl">系统提示词</label>
-                    <textarea class="fta" id="sP" rows="5" placeholder="设定角色、语气、规则..."></textarea>
-                </div>
-                <div class="lg">
-                    <div class="fg"><label class="fl">Temperature: <span id="tVal" class="rv">0.7</span></label><input type="range" class="fr" id="temp" min="0" max="2" step="0.1" value="0.7" oninput="uv('tVal',this.value)"></div>
-                    <div class="fg"><label class="fl">Top P: <span id="tpVal" class="rv">0.9</span></label><input type="range" class="fr" id="tp" min="0" max="1" step="0.05" value="0.9" oninput="uv('tpVal',this.value)"></div>
-                    <div class="fg"><label class="fl">Frequency Penalty: <span id="fpVal" class="rv">0</span></label><input type="range" class="fr" id="fp" min="-2" max="2" step="0.1" value="0" oninput="uv('fpVal',this.value)"></div>
-                    <div class="fg"><label class="fl">Presence Penalty: <span id="ppVal" class="rv">0</span></label><input type="range" class="fr" id="pp" min="-2" max="2" step="0.1" value="0" oninput="uv('ppVal',this.value)"></div>
-                </div>
-            </div>
-            <div class="tc" id="t-dat">
-                <div class="lg">
-                    <div class="fg" style="background:var(--surface);padding:14px;border-radius:10px;text-align:center">
-                        <div style="font-size:11px;color:var(--text-s)">今日请求</div>
-                        <div style="font-size:22px;font-weight:700;color:var(--primary)" id="tReq">0</div>
-                    </div>
-                    <div class="fg" style="background:var(--surface);padding:14px;border-radius:10px;text-align:center">
-                        <div style="font-size:11px;color:var(--text-s)">总消息</div>
-                        <div style="font-size:22px;font-weight:700;color:var(--accent)" id="tMsg">0</div>
-                    </div>
-                </div>
-                <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-                    <button class="ab" style="width:auto;padding:8px 12px;font-size:12px" onclick="expAll()">📤 导出全部</button>
-                    <button class="ab" style="width:auto;padding:8px 12px;font-size:12px" onclick="document.getElementById('iFile').click()">📥 导入恢复</button>
-                    <input type="file" id="iFile" style="display:none" accept=".json" onchange="impData(event)">
-                    <button class="ab" style="width:auto;padding:8px 12px;font-size:12px;background:rgba(239,68,68,0.2);color:#fca5a5" onclick="reset()">🗑️ 彻底重置</button>
-                </div>
-                <div style="margin-top:16px;padding:12px;background:var(--surface);border-radius:10px">
-                    <div style="font-size:12px;font-weight:500;margin-bottom:8px">🔐 数据加密</div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                        <span style="font-size:11px;color:var(--text-s)">当前状态: <span id="encStatus" style="color:var(--accent)">未加密</span></span>
-                        <button class="ab" style="width:auto;padding:6px 10px;font-size:11px" onclick="toggleEncrypt()">🔒 切换加密</button>
-                    </div>
-                </div>
-            </div>
+            <div class="tc" id="t-mod"><div class="fg"><label class="fl">预设模型</label><select class="fs" id="mSel" onchange="updateModelCaps();document.getElementById('cMod').value=this.value"><option value="gpt-oss-120b:free">gpt-oss</option><option value="z-ai/glm-4.5-air:free">glm-4.5-air</option><option value="custom">自定义</option></select></div><div class="fg"><label class="fl">自定义模型名</label><input type="text" class="fi" id="cMod" placeholder="model-id" oninput="updateModelCaps()"></div><div class="fg"><label class="fl">系统提示词</label><textarea class="fta" id="sP" rows="5" placeholder="设定角色、语气、规则..."></textarea></div><div class="lg"><div class="fg"><label class="fl">Temperature: <span id="tVal" class="rv">0.7</span></label><input type="range" class="fr" id="temp" min="0" max="2" step="0.1" value="0.7" oninput="uv('tVal',this.value)"></div><div class="fg"><label class="fl">Top P: <span id="tpVal" class="rv">0.9</span></label><input type="range" class="fr" id="tp" min="0" max="1" step="0.05" value="0.9" oninput="uv('tpVal',this.value)"></div><div class="fg"><label class="fl">Frequency Penalty: <span id="fpVal" class="rv">0</span></label><input type="range" class="fr" id="fp" min="-2" max="2" step="0.1" value="0" oninput="uv('fpVal',this.value)"></div><div class="fg"><label class="fl">Presence Penalty: <span id="ppVal" class="rv">0</span></label><input type="range" class="fr" id="pp" min="-2" max="2" step="0.1" value="0" oninput="uv('ppVal',this.value)"></div></div></div>
+
+<div class="tc" id="t-usage">
+  <div class="u-sec">
+    <div class="u-lbl">🔐 数据加密</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05)">
+      <span style="font-size:12px;color:var(--text-s)">状态: <span id="encStatus" style="color:var(--accent)">未加密</span></span>
+      <button class="u-btn" onclick="toggleEncrypt()">🔒 切换加密</button>
+    </div>
+  </div>
+
+  <div class="u-grid">
+    <div class="u-card" style="animation-delay:0.05s"><div class="u-lbl">📡 API 请求</div><div class="u-val" id="u-calls-t">0</div><div class="u-sub">今日 <span id="u-calls-d">0</span></div></div>
+    <div class="u-card" style="animation-delay:0.1s"><div class="u-lbl">📝 估算 Token</div><div class="u-val" id="u-tokens">0</div><div class="u-sub">入 <span id="u-in">0</span> | 出 <span id="u-out">0</span></div></div>
+    <div class="u-card" style="animation-delay:0.15s"><div class="u-lbl">🔍 搜索调用</div><div class="u-val" id="u-search">0</div><div class="u-sub">缓存命中 <span id="u-cache">0</span></div></div>
+    <div class="u-card" style="animation-delay:0.2s"><div class="u-lbl">💾 存储占用</div><div class="u-val" id="u-storage">0 KB</div><div class="u-sub">加密 <span id="u-enc">否</span></div></div>
+    <div class="u-card" style="animation-delay:0.25s"><div class="u-lbl">🔊 TTS 朗读</div><div class="u-val" id="u-tts">0</div><div class="u-sub">总次数</div></div>
+    <div class="u-card" style="animation-delay:0.3s"><div class="u-lbl">📚 库备份</div><div class="u-val" id="u-lib">0</div><div class="u-sub">已保存</div></div>
+  </div>
+  <div class="u-lbl" style="margin-top:8px">📈 近 7 天请求趋势</div>
+  <div class="u-chart" id="u-chart"></div>
+  <div class="u-cost">
+    <span style="font-size:11px;color:var(--text-s)">💰 费率 ($/1M Tokens):</span>
+    <input type="number" class="fi" id="costRate" step="0.1" value="0" onchange="UsageTracker.updateRate()" style="width:80px;padding:4px 6px;font-size:12px">
+    <span class="u-val" id="u-cost" style="font-size:16px;margin:0 0 0 auto">$0.00</span>
+  </div>
+  <div class="u-note">⚠️ 纯本地计算，Token 按 字符÷4 估算。数据绝不外传。</div>
+  <div class="u-btns">
+    <button class="u-btn" onclick="UsageTracker.exportCSV()">📤 导出 CSV</button>
+    <button class="u-btn wn" onclick="UsageTracker.clear()">🗑️ 清空统计</button>
+  </div>
+</div>
+
             <div class="tc" id="t-act"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:var(--text-s)">最近日志记录</span><button class="ab" style="width:auto;padding:4px 8px;font-size:10px" onclick="clearActivity()">🗑️ 清空</button></div><div class="act-log" id="actLog"></div></div>
         </div>
     </div>
@@ -558,6 +569,12 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
     <div class="md" style="max-width:600px">
         <div class="mh"><h2>🔗 来源详情</h2><button class="mcl" onclick="$('sourceModal').classList.remove('act')">✕</button></div>
         <div class="source-modal-content" id="sourceContent"></div>
+    </div>
+</div>
+<div class="mo" id="annModal">
+    <div class="md" style="max-width:650px">
+        <div class="mh"><h2>📢 最新公告</h2><button class="mcl" onclick="$('annModal').classList.remove('act')">✕</button></div>
+        <div class="mb"><div id="annContent" class="mt" style="line-height:1.7"></div></div>
     </div>
 </div>
 
@@ -685,15 +702,13 @@ const DEF = {
     tTypingAnim:true, typingSpeed:15, cursorStyle:'line', tMsgAnim:true, tNotifySound:false,
     msgOpacity:100, blurStrength:16, maxWidth:960, lineHeight:1.6, paraSpacing:8,
     library:[],
-    ttsEnabled: false, ttsVoiceName: 'qianyue', ttsRate: 1.0,
-    // 🧩 插件配置
-    plugins: [], tPluginAuto: true
+    ttsEnabled: false, ttsVoiceName: 'qianyue', ttsRate: 1.0
 };
 
 // ============ 全局状态 ============
 let cfg = {...DEF}, sess = [], cur = null, isStr = false, abort = null, editMsgIdx = null, sidebarCollapsed = false;
 let st = { today: 0, total: 0, date: new Date().toDateString() }, rT = [], activity = [], encryptPwd = null;
-let searchCache = new Map();
+let searchCache = new Map(), pendingSearch = null;
 let typingTimer = null, currentStreamEl = null;
 
 // ============ TTS 朗读核心 ============
@@ -716,6 +731,7 @@ function speak(text, btn) {
         utter.onerror = () => btn.classList.remove('speaking');
     }
     speechSynthesis.speak(utter);
+    UsageTracker.data.total.tts++; UsageTracker.save();
 }
 $('msgs').addEventListener('click', (e) => {
     const btn = e.target.closest('.tts-btn');
@@ -803,7 +819,7 @@ async function syncUIFromCfg() {
     if($('mSel')) $('mSel').value = cfg.mSel; if($('cMod')) $('cMod').value = cfg.cMod || cfg.mSel;
     ['pCol','aCol'].forEach(k => { if($(k)) $(k).value = cfg[k]; });
     ['mTok','mIn','dLim','rLim','mTur','aTime','fSiz','mRad','temp','tp','fp','pp'].forEach(k => { const e=$(k); if(e){ e.value=cfg[k]; uv(k+'V', e.value); } });
-    ['tSens','tTime','tComp','tMd','tHl','tStr','tMer','tKatex','tAutoSearch','tSearchSafe','tShowSearchBtn','tTypingAnim','tMsgAnim','tNotifySound','tTtsAuto','tPluginAuto'].forEach(k => { 
+    ['tSens','tTime','tComp','tMd','tHl','tStr','tMer','tKatex','tAutoSearch','tSearchSafe','tShowSearchBtn','tTypingAnim','tMsgAnim','tNotifySound','tTtsAuto'].forEach(k => { 
         const e=$(k); if(e) (cfg[k]===true||cfg[k]==='true') ? e.classList.add('act') : e.classList.remove('act'); 
     });
     ['typingSpeed','msgOpacity','blurStrength','maxWidth','lineHeight','paraSpacing','ttsRate'].forEach(k => {
@@ -820,14 +836,14 @@ async function syncUIFromCfg() {
     });
     toggleSearchConfig();
     $('encStatus').textContent = cfg.encrypted ? '已加密' : '未加密'; $('encStatus').style.color = cfg.encrypted ? '#22c55e' : 'var(--text-s)';
-    applyUI(); updateModelCaps(); renderActivity(); renderLibrary(); renderPluginList();
+    applyUI(); updateModelCaps(); renderActivity(); renderLibrary();
 }
 
 async function saveCfg() {
     const c = {};
     ['apiUrl','apiKey','cH','bgI','sP','mSel','cMod','pCol','aCol','sW','tS','tE','cCSS','fFam','user','ai','codeFont','ttsVoiceName','uiLang'].forEach(k => c[k] = $(k)?.value ?? DEF[k]);
     ['mTok','mIn','dLim','rLim','mTur','aTime','fSiz','mRad','temp','tp','fp','pp'].forEach(k => c[k] = n($(k)?.value, DEF[k]));
-    ['tSens','tTime','tComp','tMd','tHl','tStr','tMer','tKatex','tAutoSearch','tSearchSafe','tShowSearchBtn','tTypingAnim','tMsgAnim','tNotifySound','tTtsAuto','tPluginAuto'].forEach(k => c[k] = $(k)?.classList.contains('act') ?? false);
+    ['tSens','tTime','tComp','tMd','tHl','tStr','tMer','tKatex','tAutoSearch','tSearchSafe','tShowSearchBtn','tTypingAnim','tMsgAnim','tNotifySound','tTtsAuto'].forEach(k => c[k] = $(k)?.classList.contains('act') ?? false);
     c.ttsRate = n($('ttsRate')?.value, 1.0);
     c.searchProvider = $('searchProvider')?.value || 'duckduckgo';
     c.searchKey = $('searchKey')?.value || '';
@@ -847,7 +863,7 @@ async function saveCfg() {
     c.maxWidth = n($('maxWidth')?.value, 960);
     c.lineHeight = n($('lineHeight')?.value, 1.6);
     c.paraSpacing = n($('paraSpacing')?.value, 8);
-    c.encrypted = cfg.encrypted; c.encPwdHash = cfg.encPwdHash; c.library = cfg.library || []; c.plugins = cfg.plugins || [];
+    c.encrypted = cfg.encrypted; c.encPwdHash = cfg.encPwdHash; c.library = cfg.library || [];
     if(c.encrypted && encryptPwd) await saveEncrypted('uaic_cfg', c, encryptPwd); else { localStorage.setItem('uaic_cfg', JSON.stringify(c)); localStorage.removeItem('uaic_cfg_enc'); }
     cfg = c; return c;
 }
@@ -989,6 +1005,7 @@ const SearchEngine = {
         results = Array.isArray(results) ? results : [];
         if(!results.length) throw new Error('未找到结果或解析失败');
         searchCache.set(key, { r: results, t: Date.now() });
+        UsageTracker.track('search', { search: true, cache: searchCache.size });
         return results;
     },
     formatPromptAppend(results, query, safeMode=true) {
@@ -1003,140 +1020,45 @@ const SearchEngine = {
     }
 };
 
-// ============ 🧩 插件系统核心 ============
-const PluginSystem = {
-  registry: new Map(),
-  utils: {
-    fetchJSON: async (url) => {
-      const res = await fetch(url, { mode: 'cors' });
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
+// ============ 🔍 搜索预览UI管理器 ============
+const SearchUI = {
+    container: $('searchPreview'),
+    state: { loading: false, results: [], selected: new Set(), query: '', startTime: 0 },
+    render() {
+        const { loading, results, selected, query, startTime } = this.state;
+        if (loading) { this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">🔍 搜索中...</span><div class="sp-meta"><span class="sp-badge load">加载中</span></div></div><div class="sp-loading"><div class="sp-spinner"></div>正在获取实时数据...</div></div>`; return; }
+        if (!Array.isArray(results) || !results.length) return this.container.innerHTML = '';
+        const elapsed = Date.now() - startTime;
+        this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">🔍 搜索: "${esc(query)}"</span><div class="sp-meta"><span class="sp-badge ok">${results.length} 条结果</span><span style="color:var(--text-s)">${elapsed}ms</span></div></div><div class="sp-list">${results.map((r,i)=>`<div class="sp-card ${selected.has(i)?'':'disabled'}" data-idx="${i}"><input type="checkbox" class="sp-check" ${selected.has(i)?'checked':''} onclick="SearchUI.toggle(${i})"><div class="sp-info"><div class="sp-domain">${esc(r.source)}</div><div class="sp-title">${esc(r.title)}</div><div class="sp-snippet">${esc(r.snippet)}</div></div></div>`).join('')}</div><div class="sp-actions"><button class="sp-btn" onclick="SearchUI.clear()">✕ 清除</button><button class="sp-btn" onclick="SearchUI.retry()">🔄 重试</button><button class="sp-btn confirm" onclick="SearchUI.confirm()">✅ 确认并发送 (${selected.size})</button></div><div class="sp-footer">💡 勾选需要的结果。结果将安全追加至您的输入末尾。</div></div>`;
     },
-    toast, cfg: () => cfg,
-    saveCfg, logActivity
-  },
-  
-  register(manifest) {
-    try {
-      if(!manifest.id || !manifest.name || !manifest.handler) throw new Error('缺少必要字段: id, name, handler');
-      let code = manifest.handler.trim();
-      if(code.match(/^async\s+function|^function/)) code = `return (${code})(query, utils);`;
-      const fn = new Function('query', 'utils', code);
-      this.registry.set(manifest.id, { ...manifest, executor: fn });
-      logActivity('plugin', `已加载: ${manifest.name}`, 's');
-      return true;
-    } catch(e) {
-      logActivity('plugin', `加载失败 ${manifest.id}: ${e.message}`, 'e');
-      return false;
-    }
-  },
-  
-  async onMessage(text) {
-    if(cfg.tPluginAuto === false) return null;
-    for(const [id, plugin] of this.registry) {
-      const t = plugin.triggers;
-      // ✅ 修复关键词匹配：长度≥2 + 词边界匹配，避免"你好"误触发"好"
-      const kwMatch = t?.keywords?.some(k => {
-        if(!k || k.length < 2) return false;
-        const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return new RegExp(`(^|[^\\u4e00-\\u9fa5a-zA-Z0-9])${escaped}([^\\u4e00-\\u9fa5a-zA-Z0-9]|$)`).test(text);
-      });
-      if(kwMatch || t?.pattern?.test(text) || text.startsWith(t?.command || '')) {
+    async start(query) {
+        this.state = { loading: true, results: [], selected: new Set(), query, startTime: Date.now() };
+        this.render();
         try {
-          const result = await plugin.executor(text, this.utils);
-          if(result) return { pluginId: id, content: result };
+            const c = await saveCfg();
+            const res = await SearchEngine.search(query, c);
+            this.state = { ...this.state, loading: false, results: res, selected: new Set(res.map((_,i)=>i)) };
+            this.render(); logActivity('search', `${c.searchProvider}: ${query} → ${res.length} results`, 's');
         } catch(e) {
-          toast(`${plugin.name} 执行异常`, 'e');
-          console.error(e);
+            this.state.loading = false;
+            this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">❌ 搜索失败</span><span class="sp-badge err">ERROR</span></div><div class="sp-empty">${esc(e.message)}<br><button class="sp-btn" style="margin-top:8px" onclick="SearchUI.retry()">🔄 重试</button></div></div>`;
+            logActivity('search', e.message, 'e');
         }
-      }
+    },
+    toggle(idx) { 
+        if(!Array.isArray(this.state.results)) return;
+        this.state.selected.has(idx) ? this.state.selected.delete(idx) : this.state.selected.add(idx); 
+        this.render(); 
+    },
+    clear() { this.container.innerHTML=''; pendingSearch=null; $('searchBtn').disabled=false; },
+    retry() { if(this.state.query) this.start(this.state.query); },
+    confirm() {
+        if(this.state.selected.size===0) { toast('请至少选择1条结果', 'w'); return; }
+        pendingSearch = { query: this.state.query, results: this.state.results.filter((_,i) => this.state.selected.has(i)) || [] };
+        this.clear(); $('searchBtn').disabled = false;
+        toast(`已附加 ${pendingSearch.results.length} 条结果，点击发送 ➤`, 's');
     }
-    return null;
-  },
-  
-  async loadInstalled() {
-    const installed = cfg.plugins || [];
-    for(const p of installed) this.register(p);
-  },
-  
-  async install(pluginCodeOrUrl) {
-    try {
-      let manifest;
-      if(pluginCodeOrUrl.startsWith('http')) {
-        manifest = await this.utils.fetchJSON(pluginCodeOrUrl);
-      } else {
-        manifest = JSON.parse(pluginCodeOrUrl);
-      }
-      if(manifest.permissions?.length > 0) {
-        const ok = confirm(`🔐 ${manifest.name} 请求权限:\n${manifest.permissions.join('\n')}\n\n确认安装？`);
-        if(!ok) return false;
-      }
-      if(this.register(manifest)) {
-        cfg.plugins = cfg.plugins || [];
-        cfg.plugins.push(manifest);
-        await saveCfg();
-        toast(`✅ ${manifest.name} 安装成功`, 's');
-        return true;
-      }
-    } catch(e) {
-      toast(`安装失败: ${e.message}`, 'e');
-      return false;
-    }
-  }
 };
-
-// ============ 插件管理 UI ============
-function injectExamplePlugin() {
-    const example = JSON.stringify({
-      "id": "weather-uapis-cors-v1",
-      "name": "🌤️ 天气查询(国内直连)",
-      "version": "1.1.0",
-      "author": "Ultra AI",
-      "description": "调用uapis.cn免费天气API，自动添加CORS代理",
-      "icon": "🌤️",
-      "triggers": { "keywords": ["天气", "气温", "几度", "下雨", "预报"] },
-      "handler": "return (async (q, u) => {\n  const m = q.match(/(.{1,6})天气|(.{1,6})气温|(.{1,6})几度|(.{1,6})下雨|(.{1,6})预报/);\n  const rawCity = m?.[1] || m?.[2] || m?.[3] || m?.[4] || m?.[5] || '北京';\n  const city = rawCity.replace(/天气|气温|几度|下雨|预报/g, '').trim();\n  const apiUrl = `https://uapis.cn/api/v1/misc/weather?city=${encodeURIComponent(city)}&lang=zh`;\n  const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;\n  try {\n    const res = await u.fetchJSON(proxyUrl);\n    if (res?.city && res?.temperature !== undefined) {\n      return `📍 ${res.province||''}${res.city} ${res.district||''}\\n🌤️ ${res.weather} ${res.temperature}°C\\n💨 ${res.wind_direction||''}${res.wind_power||''} | 💧 ${res.humidity||'--'}%\\n🕐 更新: ${res.report_time?.slice(11,16)||'--'}`;\n    }\n    if (res?.code === 'NOT_FOUND') return `❌ 未找到城市「${city}」`;\n    return `⚠️ ${res?.message||'数据异常'}`;\n  } catch(e) {\n    try { const r2 = await u.fetchJSON(apiUrl); if(r2?.city) return `📍 ${r2.city} ${r2.weather} ${r2.temperature}°C`; } catch {}\n    return `⚠️ 请求失败，请检查网络`;\n  }\n})(query, utils);",
-      "permissions": ["network:uapis.cn", "network:api.allorigins.win"]
-    }, null, 2);
-    $('pluginInstall').value = example;
-    $('pluginInstall').focus();
-}
-function clearPluginInput() { $('pluginInstall').value = ''; }
-
-async function installPlugin() {
-  const input = $('pluginInstall').value.trim();
-  if(!input) { toast('请输入插件代码或URL', 'w'); return; }
-  const ok = await PluginSystem.install(input);
-  if(ok) { renderPluginList(); $('pluginInstall').value = ''; }
-}
-
-function renderPluginList() {
-  const grid = $('pluginGrid');
-  const plugins = cfg.plugins || [];
-  $('pluginCount').textContent = plugins.length;
-  if(!plugins.length) {
-    grid.innerHTML = '<div class="plugin-empty">暂无插件，点击「载入示例天气」体验</div>';
-    return;
-  }
-  grid.innerHTML = plugins.map(p => `
-    <div class="plugin-card">
-      <div class="plugin-icon">${p.icon||'🧩'}</div>
-      <div class="plugin-info">
-        <div class="plugin-name">${esc(p.name)}</div>
-        <div class="plugin-meta">${p.version} • ${p.author||'Unknown'}</div>
-      </div>
-      <button class="plugin-del" onclick="uninstallPlugin('${p.id}')" title="卸载">🗑️</button>
-    </div>
-  `).join('');
-}
-
-function uninstallPlugin(id) {
-  if(!confirm('确定卸载此插件？')) return;
-  cfg.plugins = (cfg.plugins||[]).filter(p=>p.id!==id);
-  PluginSystem.registry.delete(id);
-  saveCfg(); renderPluginList();
-  toast('插件已卸载', 's');
-}
 
 // ============ Markdown 渲染 ============
 function escapeHtml(unsafe) {
@@ -1280,22 +1202,8 @@ async function send() {
     if(!chkLim(txt, c)) return;
     const s = sess.find(x=>x.id===cur);
     if(s.msgs.length >= c.mTur*2) { toast('已达最大轮数','w'); return; }
-    
-    // 🧩 插件自动响应检查（修复后：精准关键词匹配）
-    if (cfg.tPluginAuto !== false) {
-      const pluginResult = await PluginSystem.onMessage(txt);
-      if(pluginResult) {
-        s.msgs.push({role:'assistant', content: pluginResult.content, plugin: pluginResult.pluginId});
-        addMsg('ai', pluginResult.content);
-        saveS(); rMsgs();
-        logActivity('plugin', `${pluginResult.pluginId} 自动回复`, 's');
-        $('userInput').value = ''; aRes(inp);
-        return;
-      }
-    }
-    
     let autoAppended = false;
-    if (SearchEngine.shouldAutoSearch(txt, c) && c.searchProvider) {
+    if (SearchEngine.shouldAutoSearch(txt, c) && c.searchProvider && !pendingSearch) {
         try {
             $('searchBtn').disabled = true;
             const results = await SearchEngine.search(txt, c);
@@ -1309,17 +1217,23 @@ async function send() {
         finally { $('searchBtn').disabled = false; }
     }
     let finalContent = txt;
-    if(!autoAppended) {
+    if(pendingSearch && Array.isArray(pendingSearch.results) && pendingSearch.results.length > 0) {
+        const append = SearchEngine.formatPromptAppend(pendingSearch.results, pendingSearch.query, cfg.tSearchSafe);
+        finalContent = pendingSearch.query + append;
+        s.msgs.push({ role:'user', content: finalContent, rawResults: pendingSearch.results });
+        pendingSearch = null; SearchUI.clear();
+    } else if(!autoAppended) {
         s.msgs.push({role:'user', content: finalContent});
         $('userInput').value = ''; aRes(inp); 
     }
-    if(s.msgs.length===1) s.title = (txt).slice(0,30);
+    if(s.msgs.length===1) s.title = (pendingSearch?.query||txt).slice(0,30);
     st.today++; st.total++; saveSt(); rList();
     isStr = true; $('sbtn').disabled = true; $('stbtn').style.display = 'block';
     const typEl = autoAppended ? document.querySelectorAll('.msg.ai .mt').pop() : addMsg('ai','',true)?.querySelector('.mt');
     const start = Date.now(); logActivity('request',`POST /chat [${c.cMod||c.mSel}]`,'w');
     try {
         const reply = await callApi(c, s, typEl);
+        UsageTracker.track('api', { in: txt.length, out: reply.length, latency: Date.now()-start });
         const duration = Date.now() - start; s.msgs.push({role:'assistant', content:reply});
         logActivity('response',`OK ${duration}ms | ${reply.length}字符`,'s');
         if(cfg.ttsEnabled) speak(reply, null);
@@ -1418,11 +1332,18 @@ function aF(f) { cfg.fFam=f; applyUI(); }
 function aFS(s) { cfg.fSiz=s; applyUI(); $('fSizV').textContent=s+'px'; $('fSizR').textContent=s; }
 function aR(r) { cfg.mRad=r; applyUI(); $('rRadV').textContent=r+'px'; $('rRadR').textContent=r; }
 function togComp(el) { el.classList.toggle('act'); applyUI(); }
-function saveSt() { localStorage.setItem('uaic_st', JSON.stringify(st)); $('tReq').textContent=st.today; $('tMsg').textContent=st.total; }
+
+// 🔧 修复: saveSt 函数添加空值检查，避免元素不存在时报错
+function saveSt() { 
+    localStorage.setItem('uaic_st', JSON.stringify(st)); 
+    if($('tReq')) $('tReq').textContent = st.today; 
+    if($('tMsg')) $('tMsg').textContent = st.total; 
+}
+
 function toast(msg, type='i') { const c = $('tcon'); if(!c) return; const t = document.createElement('div'); t.className = `tst ${type==='s'?'s':type==='e'?'e':'w'}`; t.innerHTML = `<span>${type==='s'?'✅':type==='e'?'❌':'⚠️'}</span><span>${esc(msg)}</span>`; c.appendChild(t); setTimeout(()=>t.remove(), 3500); }
 async function testApi() { const c = await saveCfg(); if(!c.apiUrl || !c.apiKey) { toast('请填写AI API', 'w'); return; } toast('测试中...', 'i'); try { const h = {'Content-Type':'application/json','Authorization':`Bearer ${c.apiKey}`}; const r = await fetch(c.apiUrl.replace(/\/+$/,'')+'/chat/completions', {method:'POST',headers:h,body:JSON.stringify({model:c.cMod||'gpt-4o-mini',messages:[{role:'user',content:'hi'}],max_tokens:10}),mode:'cors'}); if(!r.ok) throw new Error(`HTTP ${r.status}`); $('sdot').className = 'sd'; toast('AI API 连接成功', 's'); logActivity('api','连接成功','s'); } catch(e) { $('sdot').className = 'sd err'; toast(e.message, 'e'); logActivity('api',e.message,'e'); } }
 async function testSearch() { const c = await saveCfg(); if(!c.searchProvider) { toast('请选择搜索服务', 'w'); return; } toast('测试搜索中...', 'i'); try { const res = await SearchEngine.search('test', c); toast(`搜索成功: ${res.length} 条结果`, 's'); logActivity('search','测试成功','s'); } catch(e) { toast('搜索失败: '+e.message, 'e'); logActivity('search',e.message,'e'); } }
-async function manualSearch() { const t = $('userInput').value.trim(); if(!t) { toast('先输入搜索内容', 'w'); return; } try { const res = await SearchEngine.search(t, cfg); if(Array.isArray(res) && res.length) { toast(`🔍 搜索成功: ${res.length} 条`, 's'); logActivity('search', `手动搜索: ${t}`, 's'); } } catch(e) { toast('搜索失败: '+e.message, 'e'); } }
+async function manualSearch() { const t = $('userInput').value.trim(); if(!t) { toast('先输入搜索内容', 'w'); return; } await SearchUI.start(t); }
 function expChat() { const s = sess.find(x=>x.id===cur); if(!s||!s.msgs.length) { toast('空对话', 'w'); return; } let md = `# ${s.title}\n\n`; s.msgs.forEach(m=>{ const ct = Array.isArray(m.content) ? m.content.filter(c=>c.type==='text').map(c=>c.text).join('\n') : m.content; md += `## ${m.role==='user'?'👤 用户':'🤖 AI'}\n\n${ct}\n\n---\n\n`; }); const b = new Blob([md], {type:'text/markdown'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${s.title}_${new Date().toLocaleDateString()}.md`; a.click(); toast('已导出', 's'); }
 function expAll() { const backup = { sess, cfg, st, activity, library: cfg.library, time: new Date().toISOString() }; const b = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `uaic_backup_${new Date().toISOString().split('T')[0]}.json`; a.click(); toast('导出成功','s'); }
 async function impData(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async ev => { try { const data = JSON.parse(ev.target.result); if(cfg.encrypted && encryptPwd) { if(data.sess) await saveEncrypted('uaic_sess', data.sess, encryptPwd); if(data.cfg) await saveEncrypted('uaic_cfg', {...DEF,...data.cfg}, encryptPwd); } else { if(data.sess) { sess=data.sess; localStorage.setItem('uaic_sess', JSON.stringify(sess)); } if(data.cfg) localStorage.setItem('uaic_cfg',JSON.stringify({...DEF,...data.cfg})); if(data.library) { cfg.library=data.library; localStorage.setItem('uaic_lib', JSON.stringify(data.library)); } } if(!sess.length) newChat(); else { cur=sess[0].id; } await loadCfg(); rList(); rMsgs(); renderLibrary(); toast('导入成功', 's'); } catch { toast('无效文件', 'e'); } }; r.readAsText(f); }
@@ -1432,33 +1353,73 @@ function toggleSearchConfig() { const val = $('searchProvider').value; $('search
 // 📚 库功能
 function openLibrary() { renderLibrary(); $('libraryModal').classList.add('act'); }
 function closeLibrary() { $('libraryModal').classList.remove('act'); }
-async function addToLibrary(type, content) { const title = prompt('💾 保存至库，请输入标题:', `${type} 备份`) || `${type} 备份`; const item = { id: Date.now().toString(), type, title, content, created: new Date().toLocaleString() }; cfg.library.unshift(item); if(cfg.library.length > 100) cfg.library.pop(); await saveCfg(); renderLibrary(); toast('已备份到库', 's'); logActivity('library',`保存 ${type}`, 's'); }
+async function addToLibrary(type, content) { const title = prompt('💾 保存至库，请输入标题:', `${type} 备份`) || `${type} 备份`; const item = { id: Date.now().toString(), type, title, content, created: new Date().toLocaleString() }; cfg.library.unshift(item); if(cfg.library.length > 100) cfg.library.pop(); await saveCfg(); renderLibrary(); toast('已备份到库', 's'); logActivity('library',`保存 ${type}`, 's'); UsageTracker.data.total.lib++; UsageTracker.save(); }
 function renderLibrary() { const grid = $('libraryContent'); const empty = $('libraryEmpty'); if(!cfg.library || cfg.library.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; return; } empty.style.display = 'none'; grid.innerHTML = cfg.library.map(i => `<div class="lib-item"><div class="lib-type">${i.type}</div><div class="lib-title" contenteditable="true" onblur="updateLibTitle('${i.id}',this.innerText)">${esc(i.title)}</div><div style="font-size:10px;color:var(--text-s);margin-bottom:8px">${i.created}</div><div class="lib-actions"><button class="lib-abtn" onclick="copyLibItem('${i.id}')">📋 复制</button><button class="lib-abtn del" onclick="deleteLibItem('${i.id}')">🗑️</button></div></div>`).join(''); }
 function updateLibTitle(id, newTitle) { const item = cfg.library.find(x=>x.id===id); if(item) { item.title = newTitle.trim()||'未命名'; saveCfg(); toast('标题已更新','s'); } }
 function deleteLibItem(id) { if(!confirm('确定删除此备份？')) return; cfg.library = cfg.library.filter(x=>x.id!==id); saveCfg(); renderLibrary(); toast('已删除','s'); }
 function copyLibItem(id) { const item = cfg.library.find(x=>x.id===id); if(item) { navigator.clipboard.writeText(item.content).then(()=>toast('已复制到剪贴板','s')); } }
 
+// 📢 Gitee 公告获取 - 使用固定配置，禁止修改
+async function fetchAnnouncement() {
+    // 🔒 固定配置，不可修改
+    const ANN_URL = "https://gitee.com/api/v5/repos/Yellow_Box_12015/Beta/contents/%E5%85%AC%E5%91%8A.md?access_token=22fbb62c5b8616b989a570730cc2b29f";
+    
+    toast('正在获取公告...', 'i');
+    try {
+        const res = await fetch(ANN_URL, { headers: { 'Accept': 'application/json' } });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const raw = decodeURIComponent(escape(window.atob(data.content)));
+        const html = marked.parse(raw);
+        $('annContent').innerHTML = html;
+        $('annModal').classList.add('act');
+        toast('公告加载成功', 's');
+    } catch(e) {
+        toast('获取公告失败: ' + e.message, 'e');
+        $('annContent').innerHTML = `<div style="color:var(--err);padding:20px;text-align:center">⚠️ 加载失败<br><small>${esc(e.message)}</small></div>`;
+        $('annModal').classList.add('act');
+    }
+}
+
 // 粒子背景 & 错误处理 & 初始化
 (function(){const c=document.getElementById('particles'),ctx=c.getContext('2d');let w,h,pts=[];const rs=()=>{w=c.width=innerWidth;h=c.height=innerHeight};rs();addEventListener('resize',rs);for(let i=0;i<40;i++)pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,r:Math.random()*1.5+0.5,a:Math.random()*0.3+0.05});const dr=()=>{ctx.clearRect(0,0,w,h);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(99,102,241,${p.a})`;ctx.fill();for(let j=pts.indexOf(p)+1;j<pts.length;j++){const dx=p.x-pts[j].x,dy=p.y-pts[j].y,d=Math.hypot(dx,dy);if(d<100){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(99,102,241,${0.1*(1-d/100)})`;ctx.stroke()}}});requestAnimationFrame(dr)};dr()})();
 window.onerror = function(m,u,l,c,e) { if(window._errLock) return true; window._errLock=true; try{toast('系统异常: '+m,'e');logActivity('error',m,'e')}catch{} setTimeout(()=>window._errLock=false,1000); return true; };
-window.addEventListener('DOMContentLoaded', async () => { 
-    await loadCfg(); 
-    if(!sess.length) newChat(); 
-    else swSess(cur||sess[0].id); 
-    saveSt(); 
-    updateModelCaps(); 
-    loadVoices(); 
-    await PluginSystem.loadInstalled(); // 🧩 加载已安装插件
-    if('ontouchstart' in window) { 
-        document.body.classList.add('touch'); 
-        let lastTouchEnd = 0; 
-        document.addEventListener('touchend', (e) => { 
-            const now = Date.now(); 
-            if(now - lastTouchEnd <= 300) e.preventDefault(); 
-            lastTouchEnd = now; 
-        }, { passive: false }); 
-    } 
-});
+window.addEventListener('DOMContentLoaded', async () => { await loadCfg(); if(!sess.length) newChat(); else swSess(cur||sess[0].id); saveSt(); UsageTracker.init(); updateModelCaps(); loadVoices(); if('ontouchstart' in window) { document.body.classList.add('touch'); let lastTouchEnd = 0; document.addEventListener('touchend', (e) => { const now = Date.now(); if(now - lastTouchEnd <= 300) e.preventDefault(); lastTouchEnd = now; }, { passive: false }); } });
+
+// 📊 超详细用量追踪模块
+const UsageTracker = {
+  data: { daily: {}, total: { calls:0, charsIn:0, charsOut:0, search:0, cache:0, tts:0, lib:0 }, pricing: { rate:0 } },
+  init() { try { const s=localStorage.getItem('uaic_usage'); if(s) this.data=JSON.parse(s); } catch(e){} this.render(); },
+  save() { localStorage.setItem('uaic_usage', JSON.stringify(this.data)); },
+  track(t, m={}) {
+    const d=new Date().toISOString().split('T')[0]; if(!this.data.daily[d]) this.data.daily[d]={calls:0,in:0,out:0,search:0,lat:[]};
+    this.data.total.calls++; this.data.daily[d].calls++;
+    if(m.in){this.data.total.charsIn+=m.in;this.data.daily[d].in+=m.in;}
+    if(m.out){this.data.total.charsOut+=m.out;this.data.daily[d].out+=m.out;}
+    if(m.search){this.data.total.search++;this.data.daily[d].search++;}
+    if(m.cache) this.data.total.cache = m.cache;
+    if(m.lat) this.data.daily[d].lat.push(m.lat);
+    const k=Object.keys(this.data.daily); if(k.length>90) delete this.data.daily[k[0]];
+    this.save(); this.render();
+  },
+  render() {
+    const d=new Date().toISOString().split('T')[0], td=this.data.daily[d]||{calls:0,in:0,out:0,search:0,lat:[]}, t=this.data.total;
+    const s=(i,v)=>{const e=$(i);if(e)e.textContent=v;};
+    s('u-calls-t',t.calls); s('u-calls-d',td.calls); s('u-in',Math.round(t.charsIn/4)); s('u-out',Math.round(t.charsOut/4));
+    s('u-tokens',Math.round((t.charsIn+t.charsOut)/4)); s('u-search',t.search); s('u-cache',t.cache);
+    s('u-tts',t.tts); s('u-lib',t.lib); s('u-storage',(new Blob([JSON.stringify(localStorage)]).size/1024).toFixed(1)+' KB');
+    s('u-enc',cfg.encrypted?'是':'否'); s('u-cost','$'+(((t.charsIn+t.charsOut)/4/1e6)*(this.data.pricing.rate||0)).toFixed(2));
+    if($('costRate')) $('costRate').value=this.data.pricing.rate||0;
+    // 渲染趋势图
+    const c=$('u-chart'); if(!c) return; c.innerHTML=''; let mx=1; const ds=[];
+    for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().split('T')[0];const v=this.data.daily[k]?.calls||0;ds.push({k,v});if(v>mx)mx=v;}
+    ds.forEach((x,idx)=>{const h=Math.max(3,(x.v/mx)*55);const b=document.createElement('div');b.className='u-bar';b.style.height=h+'px';b.dataset.tip=`${x.k.slice(5)}: ${x.v}`;b.style.animationDelay=`${idx*0.04}s`;c.appendChild(b);});
+    document.querySelectorAll('#t-usage .u-card').forEach((el,i)=>{el.classList.remove('act');void el.offsetWidth;el.style.animationDelay=`${i*0.05}s`;el.classList.add('act');});
+  },
+  updateRate() { this.data.pricing.rate=parseFloat($('costRate').value)||0; this.save(); this.render(); },
+  exportCSV() { let c='Date,Calls,In_Chars,Out_Chars,Search,Avg_Latency\n'; Object.entries(this.data.daily).forEach(([k,v])=>{const a=v.lat.length?(v.lat.reduce((x,y)=>x+y,0)/v.lat.length).toFixed(1):0;c+=`${k},${v.calls},${v.in},${v.out},${v.search},${a}\n`;}); const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download=`uaic_usage_${new Date().toISOString().split('T')[0]}.csv`;a.click(); toast('已导出','s'); },
+  clear() { if(!confirm('⚠️ 确定清空所有用量统计？')) return; this.data={daily:{},total:{calls:0,charsIn:0,charsOut:0,search:0,cache:0,tts:0,lib:0},pricing:this.data.pricing}; this.save(); this.render(); toast('已重置','s'); }
+};
 </script>
 </body>
 </html>
