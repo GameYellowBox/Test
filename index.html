@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我的个人主页</title>
+  <meta name="description" content="低饱和度设计、支持暗黑模式的轻量级静态个人网站">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,9 +12,9 @@
     <nav>
       <a href="index.html" class="logo">🌿 我的主页</a>
       <div class="nav-links">
-        <a href="index.html" class="active">首页</a>
+        <a href="index.html">首页</a>
         <a href="blog.html">博客</a>
-        <a href="https://github.com" target="_blank">GitHub</a>
+        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
         <button id="theme-toggle" class="theme-toggle">🌙 暗黑</button>
       </div>
     </nav>
@@ -21,16 +22,16 @@
     <main>
       <div class="card">
         <h2>👋 你好，欢迎来到这里</h2>
-        <p>这是一个采用低饱和度设计、支持暗黑模式的轻量级静态网站。全部页面由纯 HTML/CSS/JS 构建，部署在 GitHub Pages 上。</p>
+        <p>这是一个采用低饱和度配色、支持系统级暗黑模式切换的轻量级静态网站。纯 HTML/CSS/JS 构建，无外部依赖，部署在 GitHub Pages 上。</p>
         <a href="blog.html" class="btn">查看博客列表 →</a>
       </div>
       
       <div class="card">
-        <h2>📦 特性一览</h2>
-        <p>✅ 低饱和度护眼配色 & 暗黑模式自动切换<br>
-           ✅ 响应式布局，移动端友好<br>
-           ✅ 自定义 404 页面 & 多页面路由<br>
-           ✅ 接入 Giscus 评论区（基于 GitHub Discussions）</p>
+        <h2>📦 核心特性</h2>
+        <p>✅ 护眼底饱和度 UI & 平滑暗黑模式切换<br>
+           ✅ 响应式布局 & 移动端深度优化<br>
+           ✅ 自定义 404 页面 & 鼠标视差交互<br>
+           ✅ 客户端实时搜索 & Giscus 评论集成</p>
       </div>
     </main>
 
@@ -38,6 +39,7 @@
       &copy; <span id="year"></span> 你的名字. 由 GitHub Pages 驱动。
     </footer>
   </div>
+  <button id="back-to-top" class="back-to-top" aria-label="返回顶部">↑</button>
   <script src="script.js"></script>
 </body>
 </html>
