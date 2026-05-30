@@ -6,7 +6,7 @@
     const CONFIG = {
         // 推荐：使用 Gitee Raw 地址（公开仓库直接访问，无需 Token）
         // 格式: https://gitee.com/{用户名}/{仓库名}/raw/{分支}/{文件路径}
-        ANN_URL: 'https://gitee.com/Yellow_Box_12015/Beta/raw/main/%E5%85%AC%E5%91%8A.md',
+        ANN_URL: 'https://github.com/GameYellowBox/Test/raw/main/%E5%85%AC%E5%91%8A.md',
         
         // 备用源（可选）：如 GitHub Raw 或 CDN
         FALLBACK_URL: null, 
