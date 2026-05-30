@@ -1362,7 +1362,7 @@ function copyLibItem(id) { const item = cfg.library.find(x=>x.id===id); if(item)
 // 📢 Gitee 公告获取 - 使用固定配置，禁止修改
 async function fetchAnnouncement() {
     // 🔒 固定配置，不可修改
-    const ANN_URL = "https://gitee.com/api/v5/repos/Yellow_Box_12015/Beta/contents/%E5%85%AC%E5%91%8A.md?access_token=22fbb62c5b8616b989a570730cc2b29f";
+    const ANN_URL = "https://gitee.com/api/v5/repos/Yellow_Box_12015/Beta/contents/%E5%85%AC%E5%91%8A.md";
     
     toast('正在获取公告...', 'i');
     try {
