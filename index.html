@@ -6,108 +6,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>⚡ Ultra AI Chat Pro + Web Search</title>
-<script>// 载入.js - 安全公告加载模块 (无硬编码令牌/零依赖)
-(function() {
-    'use strict';
-
-    // 🔧 配置区：修改此处即可切换公告源，无需改动主程序
-    const CONFIG = {
-        // 推荐：使用 Gitee Raw 地址（公开仓库直接访问，无需 Token）
-        // 格式: https://gitee.com/{用户名}/{仓库名}/raw/{分支}/{文件路径}
-        ANN_URL: 'https://github.com/GameYellowBox/Test/blob/main/%E5%85%AC%E5%91%8A.md',
-        
-        // 备用源（可选）：如 GitHub Raw 或 CDN
-        FALLBACK_URL: null, 
-        
-        CACHE_KEY: 'ann_cache_v2',
-        CACHE_TTL: 30 * 60 * 1000 // 30分钟缓存，减轻服务器压力
-    };
-
-    // 🌐 安全加载公告（暴露给全局）
-    window.fetchAnnouncement = async function() {
-        const toast = window.toast || console.log;
-        const $ = window.$ || (id => document.getElementById(id));
-        const esc = window.esc || (t => { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; });
-        const marked = window.marked;
-
-        // 1️⃣ 优先读取本地缓存
-        const cached = localStorage.getItem(CONFIG.CACHE_KEY);
-        if (cached) {
-            try {
-                const data = JSON.parse(cached);
-                if (Date.now() - data.time < CONFIG.CACHE_TTL) {
-                    renderAnnouncement(data.content, '已加载缓存公告', 's');
-                    return;
-                }
-            } catch(e) { localStorage.removeItem(CONFIG.CACHE_KEY); }
-        }
-
-        toast('正在获取公告...', 'i');
-
-        // 2️⃣ 尝试主地址
-        try {
-            const res = await fetch(CONFIG.ANN_URL, { 
-                method: 'GET',
-                headers: { 'Accept': 'text/markdown, text/plain, */*' },
-                cache: 'no-store'
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const content = await res.text();
-            
-            localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({ content, time: Date.now() }));
-            renderAnnouncement(content, '公告加载成功', 's');
-            return;
-        } catch(e) {
-            console.warn('主地址加载失败:', e.message);
-        }
-
-        // 3️⃣ 尝试备用地址
-        if (CONFIG.FALLBACK_URL) {
-            try {
-                const res = await fetch(CONFIG.FALLBACK_URL);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const content = await res.text();
-                localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({ content, time: Date.now() }));
-                renderAnnouncement(content, '通过备用源加载成功', 's');
-                return;
-            } catch(e) {
-                console.warn('备用地址加载失败:', e.message);
-            }
-        }
-
-        // 4️⃣ 失败降级：显示友好提示
-        renderAnnouncement(
-            `### ⚠️ 公告加载失败\n\n- 网络请求受阻或文件未设为公开\n- 建议管理员检查仓库设置或启用 Gitee Pages\n- 错误: ${esc(e.message || '未知')}`, 
-            '加载失败', 'e'
-        );
-    };
-
-    // 🎨 渲染公告到 UI
-    function renderAnnouncement(content, msg, type) {
-        const toast = window.toast || console.log;
-        const $ = window.$ || (id => document.getElementById(id));
-        const marked = window.marked;
-
-        let html = content;
-        if (typeof marked !== 'undefined') {
-            try {
-                marked.setOptions({ breaks: true, gfm: true });
-                html = marked.parse(content);
-            } catch(e) { html = `<pre>${esc(content)}</pre>`; }
-        } else {
-            html = `<pre style="white-space:pre-wrap;word-break:break-all;font-family:monospace">${esc(content)}</pre>`;
-        }
-
-        const annContent = $('annContent');
-        const annModal = $('annModal');
-        if (annContent) annContent.innerHTML = html;
-        if (annModal) annModal.classList.add('act');
-        if (toast) toast(msg, type);
-    }
-
-    console.log('✅ 载入.js 已就绪 | 安全公告模块加载完成');
-})();
-</script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" onerror="window._markedErr=true"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github-dark.min.css" onerror="this.disabled=true">
 <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/highlight.min.js" onerror="window._hlErr=true"></script>
@@ -193,6 +91,7 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .mermaid-actions{display:flex;justify-content:center;margin-top:8px}
 .mermaid-container svg{max-width:100%;height:auto}
 .katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0}
+
 /* 🔍 搜索预览面板 */
 .fp{display:flex;flex-direction:column;gap:8px;padding:8px 16px;max-width:var(--max-w);margin:0 auto}
 .sp-container{background:var(--search-bg);border:1px solid var(--search-border);border-radius:12px;overflow:hidden;animation:slideIn 0.25s ease}
@@ -227,6 +126,7 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .search-citation{display:inline-block;background:var(--search-bg);border:1px solid var(--search-border);border-radius:4px;padding:1px 6px;margin:0 2px;font-size:0.85em;color:var(--accent);cursor:pointer;transition:0.2s}
 .search-citation:hover{background:var(--accent);color:#fff}
 .search-disclaimer{font-size:10px;color:var(--text-s);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.03);border-radius:4px;border-left:2px solid var(--accent)}
+
 .ia{padding:12px 16px;background:var(--surface);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,0.06)}
 .icn{max-width:var(--max-w);margin:0 auto;display:flex;gap:8px;align-items:flex-end;position:relative}
 .iw{flex:1;background:var(--surface-h);border:1px solid rgba(255,255,255,0.1);border-radius:12px;transition:0.2s;padding:4px}
@@ -287,6 +187,7 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .pw-card .ok{background:var(--primary);color:#fff}
 .pw-card .cancel{background:var(--surface);color:var(--text)}
 .source-modal-content{padding:16px;font-size:13px;line-height:1.6}
+
 /* ✏️ 编辑消息模态框 */
 .edit-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:1500;display:none;place-items:center;padding:16px}
 .edit-modal.act{display:grid}
@@ -302,6 +203,7 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .edit-btn.cancel{background:var(--surface);color:var(--text)}
 .edit-btn.confirm{background:var(--primary);color:#fff}
 .edit-btn:hover{transform:translateY(-1px)}
+
 /* 💬 会话名称编辑 */
 .si.editing{background:var(--surface-h)!important}
 .si-input{flex:1;background:var(--surface);border:1px solid var(--primary);border-radius:6px;padding:4px 8px;color:var(--text);font-size:13px;font-family:inherit}
@@ -311,14 +213,17 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .si-cancel{background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px}
 .si-edit-name{opacity:0;transition:0.2s;background:none;border:none;color:var(--text-s);cursor:pointer;font-size:13px;padding:2px 4px}
 .si:hover .si-edit-name{opacity:1}
+
 /* 🗑️ 删除单条消息按钮 */
 .mxb.del{background:rgba(239,68,68,0.15);color:#fca5a5;border-color:rgba(239,68,68,0.3)}
 .mxb.del:hover{background:#ef4444;color:#fff}
+
 /* 📋 侧边栏收缩按钮 */
 .sidebar-toggle{position:absolute;right:-12px;top:50%;transform:translateY(-50%);width:24px;height:40px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);border-radius:0 8px 8px 0;color:var(--text-s);cursor:pointer;display:grid;place-items:center;font-size:12px;transition:0.2s;z-index:60}
 .sidebar-toggle:hover{color:var(--primary);background:var(--surface-h)}
 .sidebar.collapsed{transform:translateX(-100%)}
 .sidebar.collapsed + .main .mm-btn{display:grid}
+
 /* ✨ 流式输出优化 - 打字机效果 */
 .typing-cursor{display:inline-block;width:2px;height:1.2em;background:var(--accent);vertical-align:middle;animation:cursorBlink 1s step-end infinite;margin-left:2px}
 @keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
@@ -328,6 +233,7 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .msg-streaming .mc{position:relative}
 .msg-streaming .mc::after{content:'';position:absolute;right:8px;bottom:8px;width:6px;height:6px;background:var(--accent);border-radius:50%;animation:ping 1.5s ease-in-out infinite}
 @keyframes ping{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:0.5}}
+
 /* 📚 库功能样式 */
 .lib-btn{position:absolute;left:16px;bottom:80px;z-index:40;background:var(--surface);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;transition:0.2s;backdrop-filter:blur(12px)}
 .lib-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
@@ -341,42 +247,45 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 .lib-abtn{background:rgba(255,255,255,0.05);border:none;color:var(--text-s);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;transition:0.2s}
 .lib-abtn:hover{background:var(--surface-h);color:var(--primary)}
 .lib-abtn.del:hover{background:rgba(239,68,68,0.2);color:#ef4444}
+
 /* 🔊 朗读相关 */
 .mxb.tts-btn.speaking { color: var(--accent); animation: soundWave 1s infinite; }
 @keyframes soundWave { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
 @media(max-width:768px){
-.app{grid-template-columns:1fr}
-.sidebar{position:fixed;z-index:50;width:85%;max-width:320px;height:100%;transform:translateX(-100%)}
-.sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,0.3)}
-.mm-btn{display:grid}
-.lg{grid-template-columns:1fr}
-.mx{display:none}
-.msg{max-width:100%}
-.mc{padding:10px 12px;font-size:0.9em}
-.icn{padding:0}
-#userInput{font-size:16px}
-.sbtn{width:36px;height:36px}
-.cbd{padding:8px;font-size:11px}
-.fp{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
-.sp-list{max-height:180px}
-.sidebar-toggle{display:none}
-.lib-btn{left:10px;bottom:70px;padding:6px 10px;font-size:12px}
+    .app{grid-template-columns:1fr}
+    .sidebar{position:fixed;z-index:50;width:85%;max-width:320px;height:100%;transform:translateX(-100%)}
+    .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,0.3)}
+    .mm-btn{display:grid}
+    .lg{grid-template-columns:1fr}
+    .mx{display:none}
+    .msg{max-width:100%}
+    .mc{padding:10px 12px;font-size:0.9em}
+    .icn{padding:0}
+    #userInput{font-size:16px}
+    .sbtn{width:36px;height:36px}
+    .cbd{padding:8px;font-size:11px}
+    .fp{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+    .sp-list{max-height:180px}
+    .sidebar-toggle{display:none}
+    .lib-btn{left:10px;bottom:70px;padding:6px 10px;font-size:12px}
 }
 @supports (padding: max(0px)) {
-.ia{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
-.ch{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+    .ia{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+    .ch{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
 }
 @media (hover:none) and (pointer:coarse) {
-.si,.sg,.ab,.mxb,.ccp,.search-citation,.sp-btn,.lib-btn{-webkit-tap-highlight-color:transparent}
-.si:active,.sg:active,.ab:active,.sp-btn:active,.lib-btn:active{transform:scale(0.98)}
+    .si,.sg,.ab,.mxb,.ccp,.search-citation,.sp-btn,.lib-btn{-webkit-tap-highlight-color:transparent}
+    .si:active,.sg:active,.ab:active,.sp-btn:active,.lib-btn:active{transform:scale(0.98)}
 }
+
 /* 📊 用量面板专属样式 & 顶级过渡动画 */
 .tc#t-usage { position: relative; }
 .tc#t-usage.act { animation: tabBlurIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes tabBlurIn {
-0% { opacity: 0; transform: translateY(12px) scale(0.97); filter: blur(6px); }
-70% { opacity: 1; transform: translateY(0) scale(1.01); filter: blur(0); }
-100% { transform: scale(1); }
+  0% { opacity: 0; transform: translateY(12px) scale(0.97); filter: blur(6px); }
+  70% { opacity: 1; transform: translateY(0) scale(1.01); filter: blur(0); }
+  100% { transform: scale(1); }
 }
 .u-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
 .u-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; position: relative; overflow: hidden; transition: 0.25s; }
@@ -405,291 +314,305 @@ html,body{height:100%;font-family:var(--fw);font-size:var(--fs);background:var(-
 <canvas id="particles"></canvas>
 <div class="tc2" id="tcon"></div>
 <div class="pw-modal" id="pwModal">
-<div class="pw-card">
-<h3>🔐 设置数据保护密码</h3>
-<p style="font-size:12px;color:var(--text-s);margin-bottom:16px">所有聊天记录和配置将加密存储，密码丢失无法恢复。</p>
-<input type="password" id="pwInput" placeholder="输入6位以上密码">
-<input type="password" id="pwConfirm" placeholder="确认密码">
-<div class="btns"><button class="cancel" onclick="skipEncrypt()">暂不加密</button><button class="ok" onclick="confirmEncrypt()">启用加密</button></div>
-</div>
+    <div class="pw-card">
+        <h3>🔐 设置数据保护密码</h3>
+        <p style="font-size:12px;color:var(--text-s);margin-bottom:16px">所有聊天记录和配置将加密存储，密码丢失无法恢复。</p>
+        <input type="password" id="pwInput" placeholder="输入6位以上密码">
+        <input type="password" id="pwConfirm" placeholder="确认密码">
+        <div class="btns"><button class="cancel" onclick="skipEncrypt()">暂不加密</button><button class="ok" onclick="confirmEncrypt()">启用加密</button></div>
+    </div>
 </div>
 <div class="app">
-<aside class="sidebar" id="sidebar">
-<div class="sh">
-<div class="logo"><div class="li">⚡</div><div><h1>Ultra AI</h1><span>Pro + Search</span></div></div>
-<button class="nc-btn" onclick="newChat()">✨ 新建对话</button>
-</div>
-<div style="padding:8px 12px"><input type="text" class="fi" placeholder="🔍 搜索会话..." oninput="searchSessions(this.value)" style="font-size:12px"></div>
-<div class="sl" id="sl"></div>
-<div class="sf"><button class="set-btn" onclick="openSet()">⚙️ 设置</button><button class="set-btn" style="margin-top:8px" onclick="toggleActivity()">📜 日志</button></div>
-</aside>
-<main class="main">
-<header class="ch">
-<div class="ci"><button class="mm-btn" onclick="togSide()">☰</button><span class="sd" id="sdot"></span><span class="mt" id="cmod">未配置</span><span id="modelCaps" style="font-size:10px;color:var(--text-s);margin-left:4px"></span></div>
-<div class="ca"><button class="ab" onclick="expChat()" title="导出">📥</button><button class="ab" onclick="clrCur()" title="清空">🗑️</button><button class="ab" onclick="openSet()" title="设置">⚙️</button></div>
-</header>
-<div class="msgs" id="msgs"><div class="wel" id="wel"><div class="wi">🚀</div><h2>欢迎使用 Ultra AI + Web Search</h2><p>支持实时网络搜索增强。配置搜索服务后，输入"搜索/查一下"自动获取最新信息。</p><div class="sgs"><div class="sg" onclick="qSend('搜索今天特斯拉股价')">📈 实时股价</div><div class="sg" onclick="qSend('查一下最新 AI 新闻')">📰 新闻资讯</div><div class="sg" onclick="qSend('用Python写一个异步爬虫框架')">💻 代码生成</div></div></div></div>
-<div id="searchPreview" class="fp"></div>
-<button class="lib-btn" onclick="openLibrary()">📚 你的库</button>
-<button class="lib-btn" style="left:16px;bottom:16px;border-color:var(--warn);color:var(--warn)" onclick="fetchAnnouncement()">📃最新公告</button>
-<div class="ia">
-<div class="icn">
-<div class="iw"><textarea id="userInput" placeholder="输入消息... (Shift+Enter换行，输入'搜索'自动联网)" rows="1" onkeydown="hKey(event)" oninput="aRes(this)"></textarea><div class="if"><span id="cc">0 / 4000</span><span>Enter 发送</span></div></div>
-<button class="ab" id="searchBtn" onclick="manualSearch()" title="🔍 手动网络搜索">🌐</button>
-<button class="sbtn" id="sbtn" onclick="send()">➤</button><button class="stbtn" id="stbtn" onclick="stop()">⏹ 停止</button>
-</div>
-</div>
-</main>
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sh">
+            <div class="logo"><div class="li">⚡</div><div><h1>Ultra AI</h1><span>Pro + Search</span></div></div>
+            <button class="nc-btn" onclick="newChat()">✨ 新建对话</button>
+        </div>
+        <div style="padding:8px 12px"><input type="text" class="fi" placeholder="🔍 搜索会话..." oninput="searchSessions(this.value)" style="font-size:12px"></div>
+        <div class="sl" id="sl"></div>
+        <div class="sf"><button class="set-btn" onclick="openSet()">⚙️ 设置</button><button class="set-btn" style="margin-top:8px" onclick="toggleActivity()">📜 日志</button></div>
+    </aside>
+    <main class="main">
+        <header class="ch">
+            <div class="ci"><button class="mm-btn" onclick="togSide()">☰</button><span class="sd" id="sdot"></span><span class="mt" id="cmod">未配置</span><span id="modelCaps" style="font-size:10px;color:var(--text-s);margin-left:4px"></span></div>
+            <div class="ca"><button class="ab" onclick="expChat()" title="导出">📥</button><button class="ab" onclick="clrCur()" title="清空">🗑️</button><button class="ab" onclick="openSet()" title="设置">⚙️</button></div>
+        </header>
+        <div class="msgs" id="msgs"><div class="wel" id="wel"><div class="wi">🚀</div><h2>欢迎使用 Ultra AI + Web Search</h2><p>支持实时网络搜索增强。配置搜索服务后，输入"搜索/查一下"自动获取最新信息。</p><div class="sgs"><div class="sg" onclick="qSend('搜索今天特斯拉股价')">📈 实时股价</div><div class="sg" onclick="qSend('查一下最新 AI 新闻')">📰 新闻资讯</div><div class="sg" onclick="qSend('用Python写一个异步爬虫框架')">💻 代码生成</div></div></div></div>
+        <div id="searchPreview" class="fp"></div>
+        <button class="lib-btn" onclick="openLibrary()">📚 你的库</button>
+        <button class="lib-btn" style="left:16px;bottom:16px;border-color:var(--warn);color:var(--warn)" onclick="fetchAnnouncement()">📃最新公告</button>
+        <div class="ia">
+            <div class="icn">
+                <div class="iw"><textarea id="userInput" placeholder="输入消息... (Shift+Enter换行，输入'搜索'自动联网)" rows="1" onkeydown="hKey(event)" oninput="aRes(this)"></textarea><div class="if"><span id="cc">0 / 4000</span><span>Enter 发送</span></div></div>
+                <button class="ab" id="searchBtn" onclick="manualSearch()" title="🔍 手动网络搜索">🌐</button>
+                <button class="sbtn" id="sbtn" onclick="send()">➤</button><button class="stbtn" id="stbtn" onclick="stop()">⏹ 停止</button>
+            </div>
+        </div>
+    </main>
 </div>
 <div class="mo" id="setMod">
-<div class="md">
-<div class="mh"><h2>⚙️ 设置与自定义</h2><button class="mcl" onclick="closeSet()">✕</button></div>
-<div class="mb">
-<div class="mtabs"><button class="mtab act" onclick="swTab('api',this)">🔑 API</button><button class="mtab" onclick="swTab('lim',this)">🛡️ 限制</button><button class="mtab" onclick="swTab('personalize',this)">🎨 个性化</button><button class="mtab" onclick="swTab('ext',this)">🧩 拓展</button><button class="mtab" onclick="swTab('test',this)">🧪 测试功能</button><button class="mtab" onclick="swTab('mod',this)">🧠 模型</button><button class="mtab" onclick="swTab('usage',this)">📊 用量</button><button class="mtab" onclick="swTab('act',this)">📜 日志</button></div>
-<div class="tc act" id="t-api">
-<div class="fg"><label class="fl">AI API Base URL</label><input type="text" class="fi" id="apiUrl" placeholder="https://api.openai.com/v1"></div>
-<div class="fg"><label class="fl">AI API Key</label><input type="password" class="fi" id="apiKey" placeholder="sk-..."></div>
-<div class="fg"><label class="fl">自定义 Header (JSON)</label><textarea class="fta" id="cH" placeholder='{"Authorization": "Bearer xxx"}'></textarea></div>
-<div class="fg" style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
-<label class="fl" style="color:var(--accent)">🌐 网络搜索功能</label>
-<select class="fs" id="searchProvider" onchange="toggleSearchConfig()">
-<option value="">❌ 禁用</option>
-<option value="duckduckgo" selected>✅ DuckDuckGo (零认证/公共代理)</option>
-<option value="wikipedia">📚 Wikipedia (零认证/官方CORS)</option>
-<option value="github">💻 GitHub Code (零认证/官方CORS)</option>
-<option value="custom">🔧 自定义第三方引擎</option>
-</select>
-<div style="font-size:10px;color:var(--text-s);margin-top:4px">💡 推荐前3个完全免登录。自定义引擎需填写请求/响应 JSON 映射。</div>
-</div>
-<div id="searchConfig" style="display:none">
-<div class="fg" id="customSearchBox" style="display:none; margin-top:8px; padding:12px; background:var(--surface); border-radius:8px;">
-<label class="fl">🔧 自定义请求/响应配置</label>
-<div class="fg"><label class="fl">请求 URL (支持 {query}, {num})</label><input type="text" class="fi" id="customSearchUrl" placeholder="https://api.example.com/search?q={query}&n={num}"></div>
-<div class="lg">
-<div class="fg"><label class="fl">请求方法</label><select class="fs" id="customSearchMethod"><option value="GET">GET</option><option value="POST">POST</option></select></div>
-<div class="fg"><label class="fl">请求头 (JSON)</label><input type="text" class="fi" id="customSearchHeaders" placeholder='{"Authorization": "Bearer xxx"}'></div>
-</div>
-<div class="fg"><label class="fl">请求体/参数 (JSON, 支持 {query}, {num})</label><textarea class="fta" id="customSearchBody" rows="2" placeholder='{"q": "{query}", "count": {num}}'></textarea></div>
-<div class="fg"><label class="fl">结果数组路径 (如: data.results)</label><input type="text" class="fi" id="customSearchPath" placeholder="data.results 或 items"></div>
-<div class="lg">
-<div class="fg"><label class="fl">标题字段名</label><input type="text" class="fi" id="customSearchTitle" value="title"></div>
-<div class="fg"><label class="fl">链接字段名</label><input type="text" class="fi" id="customSearchLink" value="url"></div>
-<div class="fg"><label class="fl">摘要字段名</label><input type="text" class="fi" id="customSearchSnippet" value="snippet"></div>
-</div>
-</div>
-<div class="fg"><label class="fl">每次搜索结果数</label>
-<input type="range" class="fr" id="searchNum" min="1" max="6" value="3" oninput="uv('searchNumV',this.value)">
-<span class="rv" id="searchNumV">3</span>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">🤖 自动触发搜索</div>
-<div class="td2">检测到"搜索/查一下/最新"等词时自动调用</div></div>
-<div class="tg" id="tAutoSearch" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">🔒 安全模式</div>
-<div class="td2">对搜索结果做XSS过滤 + 长度限制 (推荐开启)</div></div>
-<div class="tg act" id="tSearchSafe" onclick="this.classList.toggle('act')"></div>
-</div>
-</div>
-<button class="sbtn" style="width:100%;height:36px;border-radius:8px;font-size:13px;margin-top:12px" onclick="testApi()">🔍 测试 AI API</button>
-<button class="sbtn" style="width:100%;height:36px;border-radius:8px;font-size:13px;margin-top:6px;background:var(--surface);color:var(--text)" onclick="testSearch()">🌐 测试搜索服务</button>
-</div>
-<div class="tc" id="t-lim"><div class="lg"><div class="fg"><label class="fl">最大回复 Token</label><input type="range" class="fr" id="mTok" min="1" max="128000" value="4096" oninput="uv('mTokV',this.value)"><span class="rv" id="mTokV">4096</span></div><div class="fg"><label class="fl">最大输入字符</label><input type="range" class="fr" id="mIn" min="100" max="20000" value="4000" oninput="uv('mInV',this.value)"><span class="rv" id="mInV">4000</span></div><div class="fg"><label class="fl">每日请求上限</label><input type="range" class="fr" id="dLim" min="0" max="1000" value="100" oninput="uv('dLimV',this.value)"><span class="rv" id="dLimV">100</span></div><div class="fg"><label class="fl">每分钟请求上限(RPM)</label><input type="range" class="fr" id="rLim" min="0" max="100" value="20" oninput="uv('rLimV',this.value)"><span class="rv" id="rLimV">20</span></div><div class="fg"><label class="fl">单会话最大轮数</label><input type="range" class="fr" id="mTur" min="1" max="100" value="50" oninput="uv('mTurV',this.value)"><span class="rv" id="mTurV">50</span></div><div class="fg"><label class="fl">请求超时(秒)</label><input type="range" class="fr" id="aTime" min="5" max="300" value="60" oninput="uv('aTimeV',this.value)"><span class="rv" id="aTimeV">60</span></div></div><div class="tr"><div><div style="font-size:13px;font-weight:500">启用敏感词过滤</div><div class="td2">匹配到关键词将拦截发送</div></div><div class="tg" id="tSens" onclick="this.classList.toggle('act')"></div></div><div class="fg"><textarea class="fta" id="sW" placeholder="每行一个词" rows="4"></textarea></div><div class="tr"><div><div style="font-size:13px;font-weight:500">时间使用限制</div><div class="td2">仅在设定时间段内允许发送</div></div><div class="tg" id="tTime" onclick="this.classList.toggle('act')"></div></div><div class="lg"><div class="fg"><label class="fl">开始时间</label><input type="time" class="fi" id="tS" value="08:00"></div><div class="fg"><label class="fl">结束时间</label><input type="time" class="fi" id="tE" value="23:00"></div></div></div>
-<div class="tc" id="t-personalize">
-<div class="fg"><label class="fl">主题色 (主色 / 强调色)</label><div style="display:flex;gap:8px"><input type="color" class="fi" id="pCol" value="#6366f1" onchange="aTh(this.value,document.getElementById('aCol').value)"><input type="color" class="fi" id="aCol" value="#06b6d4" onchange="aTh(document.getElementById('pCol').value,this.value)"></div></div>
-<div class="fg"><label class="fl">背景图片 URL (可选)</label><input type="text" class="fi" id="bgI" placeholder="https://..."></div>
-<div class="fg"><label class="fl">字体族</label><select class="fs" id="fFam" onchange="aF(this.value)"><option value="'Inter', system-ui, sans-serif">Inter (默认)</option><option value="system-ui, -apple-system, sans-serif">系统默认</option><option value="'JetBrains Mono', monospace">等宽字体</option><option value="'Noto Sans SC', sans-serif">Noto Sans SC</option></select></div>
-<div class="fg"><label class="fl">代码块字体</label><select class="fs" id="codeFont" onchange="aCodeFont(this.value)"><option value="'JetBrains Mono', monospace" selected>JetBrains Mono</option><option value="'Fira Code', monospace">Fira Code</option><option value="'Source Code Pro', monospace">Source Code Pro</option><option value="Consolas, monospace">Consolas</option><option value="'Courier New', monospace">Courier New</option></select></div>
-<div class="lg"><div class="fg"><label class="fl">字体大小: <span id="fSizV" class="rv">15px</span></label><input type="range" class="fr" id="fSiz" min="12" max="20" value="15" oninput="aFS(this.value)"><span class="rv" id="fSizR">15</span></div><div class="fg"><label class="fl">气泡圆角: <span id="rRadV" class="rv">18px</span></label><input type="range" class="fr" id="mRad" min="0" max="40" value="18" oninput="aR(this.value)"><span class="rv" id="rRadR">18</span></div></div>
-<!-- 🔊 TTS 声音设置 -->
-<div style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
-<label class="fl" style="color:var(--accent)">🔊 声线与朗读</label>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">📢 启用自动朗读</div><div class="td2">AI 回复完成时自动播放</div></div>
-<div class="tg" id="tTtsAuto" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="fg" style="margin-top:12px">
-<label class="fl">首选声线预设</label>
-<select class="fs" id="ttsVoiceSelect">
-<option value="qianyue">芊悦声线 (默认)</option>
-<option value="gentle">温柔女声</option>
-<option value="news">新闻播报</option>
-<option value="deep">沉稳男声</option>
-</select>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">🚀 朗读语速</div><div class="td2">0.5x - 1.5x</div></div>
-<input type="range" class="fr" id="ttsRate" min="0.5" max="1.5" step="0.1" value="1.0" oninput="uv('ttsRateV', this.value)">
-<span class="rv" id="ttsRateV">1.0</span>
-</div>
-<div style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
-<label class="fl" style="color:var(--accent)">✨ 流式输出效果</label>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">🎬 启用打字机动画</div><div class="td2">AI回复时逐字显示，带光标动画</div></div>
-<div class="tg act" id="tTypingAnim" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="fg"><label class="fl">打字速度: <span id="typingSpeedV" class="rv">15ms</span></label>
-<input type="range" class="fr" id="typingSpeed" min="5" max="100" value="15" oninput="uv('typingSpeedV',this.value+'ms')"><span class="rv" id="typingSpeedR">15</span>
-</div>
-<div class="fg"><label class="fl">光标样式</label>
-<select class="fs" id="cursorStyle" onchange="aCursor(this.value)">
-<option value="block">█ 块状光标</option>
-<option value="line" selected>│ 竖线光标</option>
-<option value="underline">‾ 下划线</option>
-<option value="bar">▎ 渐变条</option>
-</select>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">💫 消息入场动画</div><div class="td2">新消息滑入时的过渡效果</div></div>
-<div class="tg act" id="tMsgAnim" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">🔔 新消息提示音</div><div class="td2">AI回复完成时播放提示音</div></div>
-<div class="tg" id="tNotifySound" onclick="this.classList.toggle('act')"></div>
-</div>
-<div style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
-<label class="fl" style="color:var(--accent)">🎨 视觉细节</label>
-</div>
-<div class="fg"><label class="fl">消息气泡透明度: <span id="msgOpacityV" class="rv">100%</span></label>
-<input type="range" class="fr" id="msgOpacity" min="50" max="100" value="100" oninput="uv('msgOpacityV',this.value+'%')"><span class="rv" id="msgOpacityR">100</span>
-</div>
-<div class="fg"><label class="fl">背景模糊强度: <span id="blurStrengthV" class="rv">16px</span></label>
-<input type="range" class="fr" id="blurStrength" min="0" max="32" value="16" oninput="uv('blurStrengthV',this.value+'px')"><span class="rv" id="blurStrengthR">16</span>
-</div>
-<div class="fg"><label class="fl">消息最大宽度: <span id="maxWidthV" class="rv">960px</span></label>
-<input type="range" class="fr" id="maxWidth" min="600" max="1200" value="960" oninput="uv('maxWidthV',this.value+'px')"><span class="rv" id="maxWidthR">960</span>
-</div>
-<div class="lg">
-<div class="fg"><label class="fl">行高: <span id="lineHeightV" class="rv">1.6</span></label><input type="range" class="fr" id="lineHeight" min="1.2" max="2.4" step="0.1" value="1.6" oninput="uv('lineHeightV',this.value)"><span class="rv" id="lineHeightR">1.6</span></div>
-<div class="fg"><label class="fl">段落间距: <span id="paraSpacingV" class="rv">8px</span></label><input type="range" class="fr" id="paraSpacing" min="0" max="24" value="8" oninput="uv('paraSpacingV',this.value+'px')"><span class="rv" id="paraSpacingR">8</span></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">紧凑模式</div><div class="td2">减少消息间距</div></div>
-<div class="tg" id="tComp" onclick="togComp(this)"></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">Markdown 渲染</div><div class="td2">支持标题、列表、表格等</div></div>
-<div class="tg act" id="tMd" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">代码高亮</div><div class="td2">语法着色</div></div>
-<div class="tg act" id="tHl" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">流式输出</div><div class="td2">实时逐字显示</div></div>
-<div class="tg act" id="tStr" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">Mermaid 流程图</div><div class="td2">渲染 ```mermaid 代码块</div></div>
-<div class="tg act" id="tMer" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">KaTeX 数学公式</div><div class="td2">渲染 $...$ 和 $$...$$</div></div>
-<div class="tg act" id="tKatex" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="tr">
-<div><div style="font-size:13px;font-weight:500">🌐 显示搜索按钮</div><div class="td2">控制输入框右侧的网络搜索按钮可见性</div></div>
-<div class="tg act" id="tShowSearchBtn" onclick="this.classList.toggle('act')"></div>
-</div>
-<div class="fg"><label class="fl">自定义 CSS (覆盖)</label><textarea class="fta" id="cCSS" placeholder=":root { --surface: rgba(...); }" rows="5"></textarea></div>
-</div>
-<div class="tc" id="t-ext">
-<div class="fg">
-<label class="fl">🌐 界面语言</label>
-<select class="fs" id="uiLang" onchange="changeLang(this.value)">
-<option value="zh-cn">简体中文</option>
-<option value="zh-tw">繁體中文</option>
-<option value="en-us">English (US)</option>
-</select>
-</div>
-<div style="font-size:11px;color:var(--text-s);margin-top:8px">💡 切换后部分界面文本将实时更新，聊天记录不受影响。</div>
-</div>
-<div class="tc" id="t-test">
-<div style="text-align:center;padding:40px;color:var(--text-s)">暂无可用测试功能，稍后再试吧~</div>
-</div>
-<div class="tc" id="t-mod"><div class="fg"><label class="fl">预设模型</label><select class="fs" id="mSel" onchange="updateModelCaps();document.getElementById('cMod').value=this.value"><option value="gpt-oss-120b:free">gpt-oss</option><option value="z-ai/glm-4.5-air:free">glm-4.5-air</option><option value="custom">自定义</option></select></div><div class="fg"><label class="fl">自定义模型名</label><input type="text" class="fi" id="cMod" placeholder="model-id" oninput="updateModelCaps()"></div><div class="fg"><label class="fl">系统提示词</label><textarea class="fta" id="sP" rows="5" placeholder="设定角色、语气、规则..."></textarea></div><div class="lg"><div class="fg"><label class="fl">Temperature: <span id="tVal" class="rv">0.7</span></label><input type="range" class="fr" id="temp" min="0" max="2" step="0.1" value="0.7" oninput="uv('tVal',this.value)"></div><div class="fg"><label class="fl">Top P: <span id="tpVal" class="rv">0.9</span></label><input type="range" class="fr" id="tp" min="0" max="1" step="0.05" value="0.9" oninput="uv('tpVal',this.value)"></div><div class="fg"><label class="fl">Frequency Penalty: <span id="fpVal" class="rv">0</span></label><input type="range" class="fr" id="fp" min="-2" max="2" step="0.1" value="0" oninput="uv('fpVal',this.value)"></div><div class="fg"><label class="fl">Presence Penalty: <span id="ppVal" class="rv">0</span></label><input type="range" class="fr" id="pp" min="-2" max="2" step="0.1" value="0" oninput="uv('ppVal',this.value)"></div></div></div>
+    <div class="md">
+        <div class="mh"><h2>⚙️ 设置与自定义</h2><button class="mcl" onclick="closeSet()">✕</button></div>
+        <div class="mb">
+            <div class="mtabs"><button class="mtab act" onclick="swTab('api',this)">🔑 API</button><button class="mtab" onclick="swTab('lim',this)">🛡️ 限制</button><button class="mtab" onclick="swTab('personalize',this)">🎨 个性化</button><button class="mtab" onclick="swTab('ext',this)">🧩 拓展</button><button class="mtab" onclick="swTab('test',this)">🧪 测试功能</button><button class="mtab" onclick="swTab('mod',this)">🧠 模型</button><button class="mtab" onclick="swTab('usage',this)">📊 用量</button><button class="mtab" onclick="swTab('act',this)">📜 日志</button></div>
+            <div class="tc act" id="t-api">
+                <div class="fg"><label class="fl">AI API Base URL</label><input type="text" class="fi" id="apiUrl" placeholder="https://api.openai.com/v1"></div>
+                <div class="fg"><label class="fl">AI API Key</label><input type="password" class="fi" id="apiKey" placeholder="sk-..."></div>
+                <div class="fg"><label class="fl">自定义 Header (JSON)</label><textarea class="fta" id="cH" placeholder='{"Authorization": "Bearer xxx"}'></textarea></div>
+                <div class="fg" style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
+                    <label class="fl" style="color:var(--accent)">🌐 网络搜索功能</label>
+                    <select class="fs" id="searchProvider" onchange="toggleSearchConfig()">
+                        <option value="">❌ 禁用</option>
+                        <option value="duckduckgo" selected>✅ DuckDuckGo (零认证/公共代理)</option>
+                        <option value="wikipedia">📚 Wikipedia (零认证/官方CORS)</option>
+                        <option value="github">💻 GitHub Code (零认证/官方CORS)</option>
+                        <option value="custom">🔧 自定义第三方引擎</option>
+                    </select>
+                    <div style="font-size:10px;color:var(--text-s);margin-top:4px">💡 推荐前3个完全免登录。自定义引擎需填写请求/响应 JSON 映射。</div>
+                </div>
+                <div id="searchConfig" style="display:none">
+                    <div class="fg" id="customSearchBox" style="display:none; margin-top:8px; padding:12px; background:var(--surface); border-radius:8px;">
+                      <label class="fl">🔧 自定义请求/响应配置</label>
+                      <div class="fg"><label class="fl">请求 URL (支持 {query}, {num})</label><input type="text" class="fi" id="customSearchUrl" placeholder="https://api.example.com/search?q={query}&n={num}"></div>
+                      <div class="lg">
+                        <div class="fg"><label class="fl">请求方法</label><select class="fs" id="customSearchMethod"><option value="GET">GET</option><option value="POST">POST</option></select></div>
+                        <div class="fg"><label class="fl">请求头 (JSON)</label><input type="text" class="fi" id="customSearchHeaders" placeholder='{"Authorization": "Bearer xxx"}'></div>
+                      </div>
+                      <div class="fg"><label class="fl">请求体/参数 (JSON, 支持 {query}, {num})</label><textarea class="fta" id="customSearchBody" rows="2" placeholder='{"q": "{query}", "count": {num}}'></textarea></div>
+                      <div class="fg"><label class="fl">结果数组路径 (如: data.results)</label><input type="text" class="fi" id="customSearchPath" placeholder="data.results 或 items"></div>
+                      <div class="lg">
+                        <div class="fg"><label class="fl">标题字段名</label><input type="text" class="fi" id="customSearchTitle" value="title"></div>
+                        <div class="fg"><label class="fl">链接字段名</label><input type="text" class="fi" id="customSearchLink" value="url"></div>
+                        <div class="fg"><label class="fl">摘要字段名</label><input type="text" class="fi" id="customSearchSnippet" value="snippet"></div>
+                      </div>
+                    </div>
+                    <div class="fg"><label class="fl">每次搜索结果数</label>
+                        <input type="range" class="fr" id="searchNum" min="1" max="6" value="3" oninput="uv('searchNumV',this.value)">
+                        <span class="rv" id="searchNumV">3</span>
+                    </div>
+                    <div class="tr">
+                        <div><div style="font-size:13px;font-weight:500">🤖 自动触发搜索</div>
+                        <div class="td2">检测到"搜索/查一下/最新"等词时自动调用</div></div>
+                        <div class="tg" id="tAutoSearch" onclick="this.classList.toggle('act')"></div>
+                    </div>
+                    <div class="tr">
+                        <div><div style="font-size:13px;font-weight:500">🔒 安全模式</div>
+                        <div class="td2">对搜索结果做XSS过滤 + 长度限制 (推荐开启)</div></div>
+                        <div class="tg act" id="tSearchSafe" onclick="this.classList.toggle('act')"></div>
+                    </div>
+                </div>
+                <button class="sbtn" style="width:100%;height:36px;border-radius:8px;font-size:13px;margin-top:12px" onclick="testApi()">🔍 测试 AI API</button>
+                <button class="sbtn" style="width:100%;height:36px;border-radius:8px;font-size:13px;margin-top:6px;background:var(--surface);color:var(--text)" onclick="testSearch()">🌐 测试搜索服务</button>
+            </div>
+            <div class="tc" id="t-lim"><div class="lg"><div class="fg"><label class="fl">最大回复 Token</label><input type="range" class="fr" id="mTok" min="1" max="128000" value="4096" oninput="uv('mTokV',this.value)"><span class="rv" id="mTokV">4096</span></div><div class="fg"><label class="fl">最大输入字符</label><input type="range" class="fr" id="mIn" min="100" max="20000" value="4000" oninput="uv('mInV',this.value)"><span class="rv" id="mInV">4000</span></div><div class="fg"><label class="fl">每日请求上限</label><input type="range" class="fr" id="dLim" min="0" max="1000" value="100" oninput="uv('dLimV',this.value)"><span class="rv" id="dLimV">100</span></div><div class="fg"><label class="fl">每分钟请求上限(RPM)</label><input type="range" class="fr" id="rLim" min="0" max="100" value="20" oninput="uv('rLimV',this.value)"><span class="rv" id="rLimV">20</span></div><div class="fg"><label class="fl">单会话最大轮数</label><input type="range" class="fr" id="mTur" min="1" max="100" value="50" oninput="uv('mTurV',this.value)"><span class="rv" id="mTurV">50</span></div><div class="fg"><label class="fl">请求超时(秒)</label><input type="range" class="fr" id="aTime" min="5" max="300" value="60" oninput="uv('aTimeV',this.value)"><span class="rv" id="aTimeV">60</span></div></div><div class="tr"><div><div style="font-size:13px;font-weight:500">启用敏感词过滤</div><div class="td2">匹配到关键词将拦截发送</div></div><div class="tg" id="tSens" onclick="this.classList.toggle('act')"></div></div><div class="fg"><textarea class="fta" id="sW" placeholder="每行一个词" rows="4"></textarea></div><div class="tr"><div><div style="font-size:13px;font-weight:500">时间使用限制</div><div class="td2">仅在设定时间段内允许发送</div></div><div class="tg" id="tTime" onclick="this.classList.toggle('act')"></div></div><div class="lg"><div class="fg"><label class="fl">开始时间</label><input type="time" class="fi" id="tS" value="08:00"></div><div class="fg"><label class="fl">结束时间</label><input type="time" class="fi" id="tE" value="23:00"></div></div></div>
+            
+            <div class="tc" id="t-personalize">
+                <div class="fg"><label class="fl">主题色 (主色 / 强调色)</label><div style="display:flex;gap:8px"><input type="color" class="fi" id="pCol" value="#6366f1" onchange="aTh(this.value,document.getElementById('aCol').value)"><input type="color" class="fi" id="aCol" value="#06b6d4" onchange="aTh(document.getElementById('pCol').value,this.value)"></div></div>
+                <div class="fg"><label class="fl">背景图片 URL (可选)</label><input type="text" class="fi" id="bgI" placeholder="https://..."></div>
+                <div class="fg"><label class="fl">字体族</label><select class="fs" id="fFam" onchange="aF(this.value)"><option value="'Inter', system-ui, sans-serif">Inter (默认)</option><option value="system-ui, -apple-system, sans-serif">系统默认</option><option value="'JetBrains Mono', monospace">等宽字体</option><option value="'Noto Sans SC', sans-serif">Noto Sans SC</option></select></div>
+                <div class="fg"><label class="fl">代码块字体</label><select class="fs" id="codeFont" onchange="aCodeFont(this.value)"><option value="'JetBrains Mono', monospace" selected>JetBrains Mono</option><option value="'Fira Code', monospace">Fira Code</option><option value="'Source Code Pro', monospace">Source Code Pro</option><option value="Consolas, monospace">Consolas</option><option value="'Courier New', monospace">Courier New</option></select></div>
+                <div class="lg"><div class="fg"><label class="fl">字体大小: <span id="fSizV" class="rv">15px</span></label><input type="range" class="fr" id="fSiz" min="12" max="20" value="15" oninput="aFS(this.value)"><span class="rv" id="fSizR">15</span></div><div class="fg"><label class="fl">气泡圆角: <span id="rRadV" class="rv">18px</span></label><input type="range" class="fr" id="mRad" min="0" max="40" value="18" oninput="aR(this.value)"><span class="rv" id="rRadR">18</span></div></div>
+                
+                <!-- 🔊 TTS 声音设置 -->
+                <div style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
+                    <label class="fl" style="color:var(--accent)">🔊 声线与朗读</label>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">📢 启用自动朗读</div><div class="td2">AI 回复完成时自动播放</div></div>
+                    <div class="tg" id="tTtsAuto" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="fg" style="margin-top:12px">
+                    <label class="fl">首选声线预设</label>
+                    <select class="fs" id="ttsVoiceSelect">
+                        <option value="qianyue">芊悦声线 (默认)</option>
+                        <option value="gentle">温柔女声</option>
+                        <option value="news">新闻播报</option>
+                        <option value="deep">沉稳男声</option>
+                    </select>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">🚀 朗读语速</div><div class="td2">0.5x - 1.5x</div></div>
+                    <input type="range" class="fr" id="ttsRate" min="0.5" max="1.5" step="0.1" value="1.0" oninput="uv('ttsRateV', this.value)">
+                    <span class="rv" id="ttsRateV">1.0</span>
+                </div>
+
+                <div style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
+                    <label class="fl" style="color:var(--accent)">✨ 流式输出效果</label>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">🎬 启用打字机动画</div><div class="td2">AI回复时逐字显示，带光标动画</div></div>
+                    <div class="tg act" id="tTypingAnim" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="fg"><label class="fl">打字速度: <span id="typingSpeedV" class="rv">15ms</span></label>
+                    <input type="range" class="fr" id="typingSpeed" min="5" max="100" value="15" oninput="uv('typingSpeedV',this.value+'ms')"><span class="rv" id="typingSpeedR">15</span>
+                </div>
+                <div class="fg"><label class="fl">光标样式</label>
+                    <select class="fs" id="cursorStyle" onchange="aCursor(this.value)">
+                        <option value="block">█ 块状光标</option>
+                        <option value="line" selected>│ 竖线光标</option>
+                        <option value="underline">‾ 下划线</option>
+                        <option value="bar">▎ 渐变条</option>
+                    </select>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">💫 消息入场动画</div><div class="td2">新消息滑入时的过渡效果</div></div>
+                    <div class="tg act" id="tMsgAnim" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">🔔 新消息提示音</div><div class="td2">AI回复完成时播放提示音</div></div>
+                    <div class="tg" id="tNotifySound" onclick="this.classList.toggle('act')"></div>
+                </div>
+                
+                <div style="margin-top:16px;padding-top:12px;border-top:1px dashed rgba(255,255,255,0.15)">
+                    <label class="fl" style="color:var(--accent)">🎨 视觉细节</label>
+                </div>
+                <div class="fg"><label class="fl">消息气泡透明度: <span id="msgOpacityV" class="rv">100%</span></label>
+                    <input type="range" class="fr" id="msgOpacity" min="50" max="100" value="100" oninput="uv('msgOpacityV',this.value+'%')"><span class="rv" id="msgOpacityR">100</span>
+                </div>
+                <div class="fg"><label class="fl">背景模糊强度: <span id="blurStrengthV" class="rv">16px</span></label>
+                    <input type="range" class="fr" id="blurStrength" min="0" max="32" value="16" oninput="uv('blurStrengthV',this.value+'px')"><span class="rv" id="blurStrengthR">16</span>
+                </div>
+                <div class="fg"><label class="fl">消息最大宽度: <span id="maxWidthV" class="rv">960px</span></label>
+                    <input type="range" class="fr" id="maxWidth" min="600" max="1200" value="960" oninput="uv('maxWidthV',this.value+'px')"><span class="rv" id="maxWidthR">960</span>
+                </div>
+                <div class="lg">
+                    <div class="fg"><label class="fl">行高: <span id="lineHeightV" class="rv">1.6</span></label><input type="range" class="fr" id="lineHeight" min="1.2" max="2.4" step="0.1" value="1.6" oninput="uv('lineHeightV',this.value)"><span class="rv" id="lineHeightR">1.6</span></div>
+                    <div class="fg"><label class="fl">段落间距: <span id="paraSpacingV" class="rv">8px</span></label><input type="range" class="fr" id="paraSpacing" min="0" max="24" value="8" oninput="uv('paraSpacingV',this.value+'px')"><span class="rv" id="paraSpacingR">8</span></div>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">紧凑模式</div><div class="td2">减少消息间距</div></div>
+                    <div class="tg" id="tComp" onclick="togComp(this)"></div>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">Markdown 渲染</div><div class="td2">支持标题、列表、表格等</div></div>
+                    <div class="tg act" id="tMd" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">代码高亮</div><div class="td2">语法着色</div></div>
+                    <div class="tg act" id="tHl" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">流式输出</div><div class="td2">实时逐字显示</div></div>
+                    <div class="tg act" id="tStr" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">Mermaid 流程图</div><div class="td2">渲染 ```mermaid 代码块</div></div>
+                    <div class="tg act" id="tMer" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">KaTeX 数学公式</div><div class="td2">渲染 $...$ 和 $$...$$</div></div>
+                    <div class="tg act" id="tKatex" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="tr">
+                    <div><div style="font-size:13px;font-weight:500">🌐 显示搜索按钮</div><div class="td2">控制输入框右侧的网络搜索按钮可见性</div></div>
+                    <div class="tg act" id="tShowSearchBtn" onclick="this.classList.toggle('act')"></div>
+                </div>
+                <div class="fg"><label class="fl">自定义 CSS (覆盖)</label><textarea class="fta" id="cCSS" placeholder=":root { --surface: rgba(...); }" rows="5"></textarea></div>
+            </div>
+
+            <div class="tc" id="t-ext">
+                <div class="fg">
+                    <label class="fl">🌐 界面语言</label>
+                    <select class="fs" id="uiLang" onchange="changeLang(this.value)">
+                        <option value="zh-cn">简体中文</option>
+                        <option value="zh-tw">繁體中文</option>
+                        <option value="en-us">English (US)</option>
+                    </select>
+                </div>
+                <div style="font-size:11px;color:var(--text-s);margin-top:8px">💡 切换后部分界面文本将实时更新，聊天记录不受影响。</div>
+            </div>
+
+            <div class="tc" id="t-test">
+                <div style="text-align:center;padding:40px;color:var(--text-s)">暂无可用测试功能，稍后再试吧~</div>
+            </div>
+            
+            <div class="tc" id="t-mod"><div class="fg"><label class="fl">预设模型</label><select class="fs" id="mSel" onchange="updateModelCaps();document.getElementById('cMod').value=this.value"><option value="gpt-oss-120b:free">gpt-oss</option><option value="z-ai/glm-4.5-air:free">glm-4.5-air</option><option value="custom">自定义</option></select></div><div class="fg"><label class="fl">自定义模型名</label><input type="text" class="fi" id="cMod" placeholder="model-id" oninput="updateModelCaps()"></div><div class="fg"><label class="fl">系统提示词</label><textarea class="fta" id="sP" rows="5" placeholder="设定角色、语气、规则..."></textarea></div><div class="lg"><div class="fg"><label class="fl">Temperature: <span id="tVal" class="rv">0.7</span></label><input type="range" class="fr" id="temp" min="0" max="2" step="0.1" value="0.7" oninput="uv('tVal',this.value)"></div><div class="fg"><label class="fl">Top P: <span id="tpVal" class="rv">0.9</span></label><input type="range" class="fr" id="tp" min="0" max="1" step="0.05" value="0.9" oninput="uv('tpVal',this.value)"></div><div class="fg"><label class="fl">Frequency Penalty: <span id="fpVal" class="rv">0</span></label><input type="range" class="fr" id="fp" min="-2" max="2" step="0.1" value="0" oninput="uv('fpVal',this.value)"></div><div class="fg"><label class="fl">Presence Penalty: <span id="ppVal" class="rv">0</span></label><input type="range" class="fr" id="pp" min="-2" max="2" step="0.1" value="0" oninput="uv('ppVal',this.value)"></div></div></div>
+
 <div class="tc" id="t-usage">
-<div class="u-sec">
-<div class="u-lbl">🔐 数据加密</div>
-<div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05)">
-<span style="font-size:12px;color:var(--text-s)">状态: <span id="encStatus" style="color:var(--accent)">未加密</span></span>
-<button class="u-btn" onclick="toggleEncrypt()">🔒 切换加密</button>
+  <div class="u-sec">
+    <div class="u-lbl">🔐 数据加密</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05)">
+      <span style="font-size:12px;color:var(--text-s)">状态: <span id="encStatus" style="color:var(--accent)">未加密</span></span>
+      <button class="u-btn" onclick="toggleEncrypt()">🔒 切换加密</button>
+    </div>
+  </div>
+
+  <div class="u-grid">
+    <div class="u-card" style="animation-delay:0.05s"><div class="u-lbl">📡 API 请求</div><div class="u-val" id="u-calls-t">0</div><div class="u-sub">今日 <span id="u-calls-d">0</span></div></div>
+    <div class="u-card" style="animation-delay:0.1s"><div class="u-lbl">📝 估算 Token</div><div class="u-val" id="u-tokens">0</div><div class="u-sub">入 <span id="u-in">0</span> | 出 <span id="u-out">0</span></div></div>
+    <div class="u-card" style="animation-delay:0.15s"><div class="u-lbl">🔍 搜索调用</div><div class="u-val" id="u-search">0</div><div class="u-sub">缓存命中 <span id="u-cache">0</span></div></div>
+    <div class="u-card" style="animation-delay:0.2s"><div class="u-lbl">💾 存储占用</div><div class="u-val" id="u-storage">0 KB</div><div class="u-sub">加密 <span id="u-enc">否</span></div></div>
+    <div class="u-card" style="animation-delay:0.25s"><div class="u-lbl">🔊 TTS 朗读</div><div class="u-val" id="u-tts">0</div><div class="u-sub">总次数</div></div>
+    <div class="u-card" style="animation-delay:0.3s"><div class="u-lbl">📚 库备份</div><div class="u-val" id="u-lib">0</div><div class="u-sub">已保存</div></div>
+  </div>
+  <div class="u-lbl" style="margin-top:8px">📈 近 7 天请求趋势</div>
+  <div class="u-chart" id="u-chart"></div>
+  <div class="u-cost">
+    <span style="font-size:11px;color:var(--text-s)">💰 费率 ($/1M Tokens):</span>
+    <input type="number" class="fi" id="costRate" step="0.1" value="0" onchange="UsageTracker.updateRate()" style="width:80px;padding:4px 6px;font-size:12px">
+    <span class="u-val" id="u-cost" style="font-size:16px;margin:0 0 0 auto">$0.00</span>
+  </div>
+  <div class="u-note">⚠️ 纯本地计算，Token 按 字符÷4 估算。数据绝不外传。</div>
+  <div class="u-btns">
+    <button class="u-btn" onclick="UsageTracker.exportCSV()">📤 导出 CSV</button>
+    <button class="u-btn wn" onclick="UsageTracker.clear()">🗑️ 清空统计</button>
+  </div>
 </div>
-</div>
-<div class="u-grid">
-<div class="u-card" style="animation-delay:0.05s"><div class="u-lbl">📡 API 请求</div><div class="u-val" id="u-calls-t">0</div><div class="u-sub">今日 <span id="u-calls-d">0</span></div></div>
-<div class="u-card" style="animation-delay:0.1s"><div class="u-lbl">📝 估算 Token</div><div class="u-val" id="u-tokens">0</div><div class="u-sub">入 <span id="u-in">0</span> | 出 <span id="u-out">0</span></div></div>
-<div class="u-card" style="animation-delay:0.15s"><div class="u-lbl">🔍 搜索调用</div><div class="u-val" id="u-search">0</div><div class="u-sub">缓存命中 <span id="u-cache">0</span></div></div>
-<div class="u-card" style="animation-delay:0.2s"><div class="u-lbl">💾 存储占用</div><div class="u-val" id="u-storage">0 KB</div><div class="u-sub">加密 <span id="u-enc">否</span></div></div>
-<div class="u-card" style="animation-delay:0.25s"><div class="u-lbl">🔊 TTS 朗读</div><div class="u-val" id="u-tts">0</div><div class="u-sub">总次数</div></div>
-<div class="u-card" style="animation-delay:0.3s"><div class="u-lbl">📚 库备份</div><div class="u-val" id="u-lib">0</div><div class="u-sub">已保存</div></div>
-</div>
-<div class="u-lbl" style="margin-top:8px">📈 近 7 天请求趋势</div>
-<div class="u-chart" id="u-chart"></div>
-<div class="u-cost">
-<span style="font-size:11px;color:var(--text-s)">💰 费率 ($/1M Tokens):</span>
-<input type="number" class="fi" id="costRate" step="0.1" value="0" onchange="UsageTracker.updateRate()" style="width:80px;padding:4px 6px;font-size:12px">
-<span class="u-val" id="u-cost" style="font-size:16px;margin:0 0 0 auto">$0.00</span>
-</div>
-<div class="u-note">⚠️ 纯本地计算，Token 按 字符÷4 估算。数据绝不外传。</div>
-<div class="u-btns">
-<button class="u-btn" onclick="UsageTracker.exportCSV()">📤 导出 CSV</button>
-<button class="u-btn wn" onclick="UsageTracker.clear()">🗑️ 清空统计</button>
-</div>
-</div>
-<div class="tc" id="t-act"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:var(--text-s)">最近日志记录</span><button class="ab" style="width:auto;padding:4px 8px;font-size:10px" onclick="clearActivity()">🗑️ 清空</button></div><div class="act-log" id="actLog"></div></div>
-</div>
-</div>
+
+            <div class="tc" id="t-act"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:var(--text-s)">最近日志记录</span><button class="ab" style="width:auto;padding:4px 8px;font-size:10px" onclick="clearActivity()">🗑️ 清空</button></div><div class="act-log" id="actLog"></div></div>
+        </div>
+    </div>
 </div>
 <div class="mo" id="actModal"><div class="md" style="max-width:500px"><div class="mh"><h2>📜 日志</h2><button class="mcl" onclick="toggleActivity()">✕</button></div><div class="mb"><div class="act-log" id="actFloat" style="max-height:400px"></div></div></div></div>
 <div class="mo" id="sourceModal">
-<div class="md" style="max-width:600px">
-<div class="mh"><h2>🔗 来源详情</h2><button class="mcl" onclick="$('sourceModal').classList.remove('act')">✕</button></div>
-<div class="source-modal-content" id="sourceContent"></div>
-</div>
+    <div class="md" style="max-width:600px">
+        <div class="mh"><h2>🔗 来源详情</h2><button class="mcl" onclick="$('sourceModal').classList.remove('act')">✕</button></div>
+        <div class="source-modal-content" id="sourceContent"></div>
+    </div>
 </div>
 <div class="mo" id="annModal">
-<div class="md" style="max-width:650px">
-<div class="mh"><h2>📢 最新公告</h2><button class="mcl" onclick="$('annModal').classList.remove('act')">✕</button></div>
-<div class="mb"><div id="annContent" class="mt" style="line-height:1.7"></div></div>
+    <div class="md" style="max-width:650px">
+        <div class="mh"><h2>📢 最新公告</h2><button class="mcl" onclick="$('annModal').classList.remove('act')">✕</button></div>
+        <div class="mb"><div id="annContent" class="mt" style="line-height:1.7"></div></div>
+    </div>
 </div>
-</div>
+
 <!-- ✏️ 编辑消息模态框 -->
 <div class="mo edit-modal" id="editMsgModal">
-<div class="edit-card">
-<div class="edit-header">
-<h3>✏️ 编辑消息</h3>
-<button class="edit-close" onclick="closeEditModal()">✕</button>
+    <div class="edit-card">
+        <div class="edit-header">
+            <h3>✏️ 编辑消息</h3>
+            <button class="edit-close" onclick="closeEditModal()">✕</button>
+        </div>
+        <div class="edit-body">
+            <textarea class="edit-textarea" id="editMsgContent" placeholder="输入要修改的内容..."></textarea>
+        </div>
+        <div class="edit-footer">
+            <button class="edit-btn cancel" onclick="closeEditModal()">取消</button>
+            <button class="edit-btn confirm" onclick="confirmEditMsg()">确认修改</button>
+        </div>
+    </div>
 </div>
-<div class="edit-body">
-<textarea class="edit-textarea" id="editMsgContent" placeholder="输入要修改的内容..."></textarea>
-</div>
-<div class="edit-footer">
-<button class="edit-btn cancel" onclick="closeEditModal()">取消</button>
-<button class="edit-btn confirm" onclick="confirmEditMsg()">确认修改</button>
-</div>
-</div>
-</div>
+
 <!-- 📚 库模态框 -->
 <div class="mo" id="libraryModal">
-<div class="md" style="max-width:800px">
-<div class="mh">
-<h2>📚 你的内容库</h2>
-<div style="display:flex;gap:8px">
-<button class="mcl" onclick="closeLibrary()">✕</button>
+    <div class="md" style="max-width:800px">
+        <div class="mh">
+            <h2>📚 你的内容库</h2>
+            <div style="display:flex;gap:8px">
+                <button class="mcl" onclick="closeLibrary()">✕</button>
+            </div>
+        </div>
+        <div class="mb">
+            <div id="libraryContent" class="lib-modal-grid"></div>
+            <div id="libraryEmpty" style="text-align:center;padding:40px;color:var(--text-s);display:none">
+                📭 暂无收藏内容<br>在代码块或表格右上角点击 💾 即可备份
+            </div>
+        </div>
+    </div>
 </div>
-</div>
-<div class="mb">
-<div id="libraryContent" class="lib-modal-grid"></div>
-<div id="libraryEmpty" style="text-align:center;padding:40px;color:var(--text-s);display:none">
-📭 暂无收藏内容<br>在代码块或表格右上角点击 💾 即可备份
-</div>
-</div>
-</div>
-</div>
+
 <script>
 // ============ 基础工具 ============
 const $ = id => document.getElementById(id);
@@ -697,671 +620,690 @@ const esc = t => { const el = document.createElement('div'); el.textContent = t;
 const n = (v, def) => { const x = parseFloat(v); return isNaN(x) ? def : x; };
 const uv = (id, v) => { const e = $(id); if(e) e.textContent = v; };
 const safeAppend = (parent, child) => { if(parent && child instanceof Node) { parent.appendChild(child); return true; } return false; };
+
 // ============ 禁止右键 ============
 document.addEventListener('contextmenu', e => {
-if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-e.preventDefault();
-return false;
-}
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        return false;
+    }
 });
+
 // ============ 🌐 语言切换 ============
 function changeLang(lang, skipToast=false) {
-cfg.uiLang = lang;
-document.documentElement.lang = lang;
-document.documentElement.setAttribute('xml:lang', lang);
-const texts = {
-'zh-cn': { ph: "输入消息... (Shift+Enter换行，输入'搜索'自动联网)", nc: "✨ 新建对话", sp: "🔍 搜索会话...", wel: "欢迎使用 Ultra AI + Web Search" },
-'zh-tw': { ph: "輸入訊息... (Shift+Enter換行，輸入'搜索'自動聯網)", nc: "✨ 新建對話", sp: "🔍 搜尋會話...", wel: "歡迎使用 Ultra AI + Web Search" },
-'en-us': { ph: "Type a message... (Shift+Enter for newline)", nc: "✨ New Chat", sp: "🔍 Search sessions...", wel: "Welcome to Ultra AI + Web Search" }
-};
-const t = texts[lang] || texts['zh-cn'];
-if($('userInput')) $('userInput').placeholder = t.ph;
-const ncBtn = document.querySelector('.nc-btn');
-if(ncBtn) ncBtn.innerHTML = t.nc;
-const sInput = document.querySelector('.sl input[type="text"]');
-if(sInput) sInput.placeholder = t.sp;
-const welH2 = document.querySelector('.wel h2');
-if(welH2) welH2.textContent = t.wel;
-if(!skipToast) { saveCfg(); const msg = {'zh-cn':'语言已切换','zh-tw':'語言已切換','en-us':'Language switched'}[lang]; toast(msg, 's'); }
+    cfg.uiLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.setAttribute('xml:lang', lang);
+    const texts = {
+        'zh-cn': { ph: "输入消息... (Shift+Enter换行，输入'搜索'自动联网)", nc: "✨ 新建对话", sp: "🔍 搜索会话...", wel: "欢迎使用 Ultra AI + Web Search" },
+        'zh-tw': { ph: "輸入訊息... (Shift+Enter換行，輸入'搜索'自動聯網)", nc: "✨ 新建對話", sp: "🔍 搜尋會話...", wel: "歡迎使用 Ultra AI + Web Search" },
+        'en-us': { ph: "Type a message... (Shift+Enter for newline)", nc: "✨ New Chat", sp: "🔍 Search sessions...", wel: "Welcome to Ultra AI + Web Search" }
+    };
+    const t = texts[lang] || texts['zh-cn'];
+    if($('userInput')) $('userInput').placeholder = t.ph;
+    const ncBtn = document.querySelector('.nc-btn');
+    if(ncBtn) ncBtn.innerHTML = t.nc;
+    const sInput = document.querySelector('.sl input[type="text"]');
+    if(sInput) sInput.placeholder = t.sp;
+    const welH2 = document.querySelector('.wel h2');
+    if(welH2) welH2.textContent = t.wel;
+    if(!skipToast) { saveCfg(); const msg = {'zh-cn':'语言已切换','zh-tw':'語言已切換','en-us':'Language switched'}[lang]; toast(msg, 's'); }
 }
+
 // ============ 声线预设配置 ============
 const VOICE_PROFILES = {
-qianyue: { name: '芊悦声线', rate: 1.0, pitch: 1.05, filter: v => v.lang.startsWith('zh-CN') },
-gentle: { name: '温柔女声', rate: 0.9, pitch: 1.15, filter: v => v.lang.startsWith('zh') },
-news: { name: '新闻播报', rate: 1.15, pitch: 0.95, filter: v => v.lang.startsWith('zh-CN') },
-deep: { name: '沉稳男声', rate: 0.85, pitch: 0.75, filter: v => v.lang.startsWith('zh') }
+    qianyue: { name: '芊悦声线', rate: 1.0, pitch: 1.05, filter: v => v.lang.startsWith('zh-CN') },
+    gentle: { name: '温柔女声', rate: 0.9, pitch: 1.15, filter: v => v.lang.startsWith('zh') },
+    news: { name: '新闻播报', rate: 1.15, pitch: 0.95, filter: v => v.lang.startsWith('zh-CN') },
+    deep: { name: '沉稳男声', rate: 0.85, pitch: 0.75, filter: v => v.lang.startsWith('zh') }
 };
+
 let voices = [];
 function loadVoices() { voices = speechSynthesis.getVoices(); }
 if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
 loadVoices();
+
 // ============ 加密工具 ============
 const CryptoUtil = {
-key: null, salt: new TextEncoder().encode('ultra-ai-salt-v2'),
-async deriveKey(password) {
-const enc = new TextEncoder();
-const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
-return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: this.salt, iterations: 150000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
-},
-async encrypt(data, password) {
-if (!this.key) this.key = await this.deriveKey(password);
-const iv = crypto.getRandomValues(new Uint8Array(12));
-const enc = new TextEncoder().encode(JSON.stringify(data));
-const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, this.key, enc);
-return { iv: Array.from(iv), ct: Array.from(new Uint8Array(ct)) };
-},
-async decrypt(encrypted, password) {
-if (!this.key) this.key = await this.deriveKey(password);
-const { iv, ct } = encrypted;
-const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: new Uint8Array(iv) }, this.key, new Uint8Array(ct));
-return JSON.parse(new TextDecoder().decode(pt));
-}
+    key: null, salt: new TextEncoder().encode('ultra-ai-salt-v2'),
+    async deriveKey(password) {
+        const enc = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+        return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: this.salt, iterations: 150000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+    },
+    async encrypt(data, password) {
+        if (!this.key) this.key = await this.deriveKey(password);
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const enc = new TextEncoder().encode(JSON.stringify(data));
+        const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, this.key, enc);
+        return { iv: Array.from(iv), ct: Array.from(new Uint8Array(ct)) };
+    },
+    async decrypt(encrypted, password) {
+        if (!this.key) this.key = await this.deriveKey(password);
+        const { iv, ct } = encrypted;
+        const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: new Uint8Array(iv) }, this.key, new Uint8Array(ct));
+        return JSON.parse(new TextDecoder().decode(pt));
+    }
 };
+
 // ============ 默认配置 ============
-const DEF = {
-apiUrl:'',apiKey:'',cH:'',bgI:'',sP:'',mSel:'gpt-4o',cMod:'gpt-4o',
-pCol:'#6366f1',aCol:'#06b6d4',sW:'',tS:'08:00',tE:'23:00',cCSS:'',
-uiLang:'zh-cn',
-fFam:"'Inter', system-ui, sans-serif", codeFont:"'JetBrains Mono', monospace",
-mTok:4096,mIn:4000,dLim:100,rLim:20,mTur:50,aTime:60,
-fSiz:15,mRad:18,temp:0.7,tp:0.9,fp:0,pp:0,
-tSens:false,tTime:false,tComp:false,tMd:true,tHl:true,tStr:true,tMer:true,tKatex:true,
-user:'我',ai:'AI',encrypted:false,encPwdHash:'',
-searchProvider:'duckduckgo',searchKey:'',searchNum:3,tAutoSearch:false,tSearchSafe:true,
-customSearchUrl:'', customSearchMethod:'GET', customSearchHeaders:'', customSearchBody:'', customSearchPath:'results', customSearchTitle:'title', customSearchLink:'url', customSearchSnippet:'snippet',
-tShowSearchBtn:true,
-tTypingAnim:true, typingSpeed:15, cursorStyle:'line', tMsgAnim:true, tNotifySound:false,
-msgOpacity:100, blurStrength:16, maxWidth:960, lineHeight:1.6, paraSpacing:8,
-library:[],
-ttsEnabled: false, ttsVoiceName: 'qianyue', ttsRate: 1.0
+const DEF = { 
+    apiUrl:'',apiKey:'',cH:'',bgI:'',sP:'',mSel:'gpt-4o',cMod:'gpt-4o', 
+    pCol:'#6366f1',aCol:'#06b6d4',sW:'',tS:'08:00',tE:'23:00',cCSS:'',
+    uiLang:'zh-cn',
+    fFam:"'Inter', system-ui, sans-serif", codeFont:"'JetBrains Mono', monospace",
+    mTok:4096,mIn:4000,dLim:100,rLim:20,mTur:50,aTime:60,
+    fSiz:15,mRad:18,temp:0.7,tp:0.9,fp:0,pp:0, 
+    tSens:false,tTime:false,tComp:false,tMd:true,tHl:true,tStr:true,tMer:true,tKatex:true,
+    user:'我',ai:'AI',encrypted:false,encPwdHash:'',
+    searchProvider:'duckduckgo',searchKey:'',searchNum:3,tAutoSearch:false,tSearchSafe:true,
+    customSearchUrl:'', customSearchMethod:'GET', customSearchHeaders:'', customSearchBody:'', customSearchPath:'results', customSearchTitle:'title', customSearchLink:'url', customSearchSnippet:'snippet',
+    tShowSearchBtn:true,
+    tTypingAnim:true, typingSpeed:15, cursorStyle:'line', tMsgAnim:true, tNotifySound:false,
+    msgOpacity:100, blurStrength:16, maxWidth:960, lineHeight:1.6, paraSpacing:8,
+    library:[],
+    ttsEnabled: false, ttsVoiceName: 'qianyue', ttsRate: 1.0
 };
+
 // ============ 全局状态 ============
 let cfg = {...DEF}, sess = [], cur = null, isStr = false, abort = null, editMsgIdx = null, sidebarCollapsed = false;
 let st = { today: 0, total: 0, date: new Date().toDateString() }, rT = [], activity = [], encryptPwd = null;
 let searchCache = new Map(), pendingSearch = null;
 let typingTimer = null, currentStreamEl = null;
+
 // ============ TTS 朗读核心 ============
 function speak(text, btn) {
-if(!cfg.ttsEnabled && !btn) return;
-window.speechSynthesis.cancel();
-const profileKey = cfg.ttsVoiceName || 'qianyue';
-const profile = VOICE_PROFILES[profileKey] || VOICE_PROFILES.qianyue;
-let voice = voices.find(profile.filter);
-if(!voice) voice = voices.find(v => v.lang.startsWith('zh'));
-if(!voice && voices.length) voice = voices[0];
-const utter = new SpeechSynthesisUtterance(text);
-if(voice) utter.voice = voice;
-utter.rate = profile.rate * n(cfg.ttsRate, 1.0);
-utter.pitch = profile.pitch;
-utter.volume = 1.0;
-if(btn) {
-btn.classList.add('speaking');
-utter.onend = () => btn.classList.remove('speaking');
-utter.onerror = () => btn.classList.remove('speaking');
-}
-speechSynthesis.speak(utter);
-UsageTracker.data.total.tts++; UsageTracker.save();
+    if(!cfg.ttsEnabled && !btn) return;
+    window.speechSynthesis.cancel();
+    const profileKey = cfg.ttsVoiceName || 'qianyue';
+    const profile = VOICE_PROFILES[profileKey] || VOICE_PROFILES.qianyue;
+    let voice = voices.find(profile.filter);
+    if(!voice) voice = voices.find(v => v.lang.startsWith('zh'));
+    if(!voice && voices.length) voice = voices[0];
+    const utter = new SpeechSynthesisUtterance(text);
+    if(voice) utter.voice = voice;
+    utter.rate = profile.rate * n(cfg.ttsRate, 1.0);
+    utter.pitch = profile.pitch;
+    utter.volume = 1.0;
+    if(btn) {
+        btn.classList.add('speaking');
+        utter.onend = () => btn.classList.remove('speaking');
+        utter.onerror = () => btn.classList.remove('speaking');
+    }
+    speechSynthesis.speak(utter);
+    UsageTracker.data.total.tts++; UsageTracker.save();
 }
 $('msgs').addEventListener('click', (e) => {
-const btn = e.target.closest('.tts-btn');
-if(btn && btn.dataset.tts === 'true') {
-const idx = btn.dataset.msgIdx;
-const s = sess.find(x=>x.id===cur);
-if(s && s.msgs[idx]) speak(s.msgs[idx].content, btn);
-}
+    const btn = e.target.closest('.tts-btn');
+    if(btn && btn.dataset.tts === 'true') {
+        const idx = btn.dataset.msgIdx;
+        const s = sess.find(x=>x.id===cur);
+        if(s && s.msgs[idx]) speak(s.msgs[idx].content, btn);
+    }
 });
+
 // ============ Activity 日志 ============
 function logActivity(type, msg, status='i', meta={}) {
-const statusMap = {'s':'成功','e':'错误','w':'警告','i':'记录'};
-const item = { time: new Date().toLocaleTimeString(), type, msg, status: statusMap[status] || status, ...meta };
-activity.unshift(item); if(activity.length > 100) activity.pop();
-renderActivity(); saveActivity();
+    const statusMap = {'s':'成功','e':'错误','w':'警告','i':'记录'};
+    const item = { time: new Date().toLocaleTimeString(), type, msg, status: statusMap[status] || status, ...meta };
+    activity.unshift(item); if(activity.length > 100) activity.pop();
+    renderActivity(); saveActivity();
 }
 function renderActivity() {
-const r = (el, list) => {
-if(!el) return;
-el.innerHTML = list.map(i => `<div class="act-item"><span class="act-time">${i.time}</span><span>${esc(i.msg)}</span><span class="act-status ${i.status.includes('成功')?'s':i.status.includes('错误')?'e':'w'}">${i.status}</span></div>`).join('') || '<div style="color:var(--text-s);text-align:center;padding:20px">暂无记录</div>';
-};
-r($('actLog'), activity.slice(0,20)); r($('actFloat'), activity);
+    const r = (el, list) => { 
+        if(!el) return; 
+        el.innerHTML = list.map(i => `<div class="act-item"><span class="act-time">${i.time}</span><span>${esc(i.msg)}</span><span class="act-status ${i.status.includes('成功')?'s':i.status.includes('错误')?'e':'w'}">${i.status}</span></div>`).join('') || '<div style="color:var(--text-s);text-align:center;padding:20px">暂无记录</div>'; 
+    };
+    r($('actLog'), activity.slice(0,20)); r($('actFloat'), activity);
 }
 function clearActivity() { activity = []; renderActivity(); localStorage.removeItem('uaic_act'); toast('日志已清空','s'); }
 function saveActivity() {
-if(cfg.encrypted && encryptPwd) saveEncrypted('uaic_act', activity, encryptPwd);
-else localStorage.setItem('uaic_act', JSON.stringify(activity));
+    if(cfg.encrypted && encryptPwd) saveEncrypted('uaic_act', activity, encryptPwd);
+    else localStorage.setItem('uaic_act', JSON.stringify(activity));
 }
 function toggleActivity() { $('actModal').classList.toggle('act'); }
+
 // ============ 加密存储 ============
 async function saveEncrypted(key, data, password) {
-try { const enc = await CryptoUtil.encrypt(data, password); localStorage.setItem(key + '_enc', JSON.stringify(enc)); localStorage.removeItem(key); return true; }
-catch(e) { console.error('加密失败:', e); logActivity('storage','加密失败','e'); return false; }
+    try { const enc = await CryptoUtil.encrypt(data, password); localStorage.setItem(key + '_enc', JSON.stringify(enc)); localStorage.removeItem(key); return true; }
+    catch(e) { console.error('加密失败:', e); logActivity('storage','加密失败','e'); return false; }
 }
 async function loadEncrypted(key, password) {
-try { const raw = localStorage.getItem(key + '_enc'); if (!raw) return null; return await CryptoUtil.decrypt(JSON.parse(raw), password); }
-catch(e) { return null; }
+    try { const raw = localStorage.getItem(key + '_enc'); if (!raw) return null; return await CryptoUtil.decrypt(JSON.parse(raw), password); }
+    catch(e) { return null; }
 }
-function toggleEncrypt() {
-if(cfg.encrypted) {
-if(!encryptPwd) { const p = prompt('🔐 输入密码以关闭加密:'); if(!p) return; encryptPwd = p; }
-Promise.all([loadEncrypted('uaic_cfg',encryptPwd), loadEncrypted('uaic_sess',encryptPwd), loadEncrypted('uaic_lib',encryptPwd)]).then(async([c,s,l])=>{
-if(!c) { toast('密码错误','e'); return; }
-localStorage.setItem('uaic_cfg', JSON.stringify(c)); localStorage.setItem('uaic_sess', JSON.stringify(s||[])); localStorage.setItem('uaic_lib', JSON.stringify(l||[]));
-['uaic_cfg_enc','uaic_sess_enc','uaic_act_enc','uaic_lib_enc'].forEach(k=>localStorage.removeItem(k));
-cfg = {...DEF, ...c}; encryptPwd = null; cfg.encrypted = false; cfg.encPwdHash = '';
-await syncUIFromCfg(); toast('已关闭加密','s'); renderActivity(); renderLibrary(); logActivity('security','关闭数据加密','s');
-});
-} else { $('pwModal').classList.add('act'); }
+function toggleEncrypt() { 
+    if(cfg.encrypted) { 
+        if(!encryptPwd) { const p = prompt('🔐 输入密码以关闭加密:'); if(!p) return; encryptPwd = p; } 
+        Promise.all([loadEncrypted('uaic_cfg',encryptPwd), loadEncrypted('uaic_sess',encryptPwd), loadEncrypted('uaic_lib',encryptPwd)]).then(async([c,s,l])=>{ 
+            if(!c) { toast('密码错误','e'); return; } 
+            localStorage.setItem('uaic_cfg', JSON.stringify(c)); localStorage.setItem('uaic_sess', JSON.stringify(s||[])); localStorage.setItem('uaic_lib', JSON.stringify(l||[]));
+            ['uaic_cfg_enc','uaic_sess_enc','uaic_act_enc','uaic_lib_enc'].forEach(k=>localStorage.removeItem(k)); 
+            cfg = {...DEF, ...c}; encryptPwd = null; cfg.encrypted = false; cfg.encPwdHash = ''; 
+            await syncUIFromCfg(); toast('已关闭加密','s'); renderActivity(); renderLibrary(); logActivity('security','关闭数据加密','s'); 
+        }); 
+    } else { $('pwModal').classList.add('act'); } 
 }
 function skipEncrypt() { $('pwModal').classList.remove('act'); }
-async function confirmEncrypt() {
-const p1 = $('pwInput').value, p2 = $('pwConfirm').value;
-if(p1.length < 6) { toast('密码至少6位','e'); return; }
-if(p1 !== p2) { toast('两次密码不一致','e'); return; }
-encryptPwd = p1; $('pwModal').classList.remove('act'); $('pwInput').value = $('pwConfirm').value = '';
-await Promise.all([saveEncrypted('uaic_cfg', cfg, p1), saveEncrypted('uaic_sess', sess, p1), saveEncrypted('uaic_lib', cfg.library, p1)]);
-cfg.encrypted = true; cfg.encPwdHash = '***'; saveCfg();
-$('encStatus').textContent = '已加密'; $('encStatus').style.color = '#22c55e';
-toast('加密已启用','s'); logActivity('security','启用数据加密','s');
+async function confirmEncrypt() { 
+    const p1 = $('pwInput').value, p2 = $('pwConfirm').value; 
+    if(p1.length < 6) { toast('密码至少6位','e'); return; } 
+    if(p1 !== p2) { toast('两次密码不一致','e'); return; } 
+    encryptPwd = p1; $('pwModal').classList.remove('act'); $('pwInput').value = $('pwConfirm').value = ''; 
+    await Promise.all([saveEncrypted('uaic_cfg', cfg, p1), saveEncrypted('uaic_sess', sess, p1), saveEncrypted('uaic_lib', cfg.library, p1)]); 
+    cfg.encrypted = true; cfg.encPwdHash = '***'; saveCfg(); 
+    $('encStatus').textContent = '已加密'; $('encStatus').style.color = '#22c55e'; 
+    toast('加密已启用','s'); logActivity('security','启用数据加密','s'); 
 }
+
 // ============ 配置加载/保存 ============
 async function loadCfg() {
-try {
-if(localStorage.getItem('uaic_cfg_enc')) {
-const pwd = prompt('🔐 输入数据保护密码:'); if(!pwd) return;
-const c = await loadEncrypted('uaic_cfg', pwd); const s = await loadEncrypted('uaic_sess', pwd); const a = await loadEncrypted('uaic_act', pwd); const l = await loadEncrypted('uaic_lib', pwd);
-if(!c) { toast('密码错误或数据损坏','e'); return; }
-cfg = {...DEF, ...c}; if(l) cfg.library = l; encryptPwd = pwd; sess = s || []; activity = a || [];
-} else {
-cfg = {...DEF, ...JSON.parse(localStorage.getItem('uaic_cfg') || '{}')};
-const sRaw = localStorage.getItem('uaic_sess'); if(sRaw) sess = JSON.parse(sRaw);
-const aRaw = localStorage.getItem('uaic_act'); if(aRaw) activity = JSON.parse(aRaw);
-const lRaw = localStorage.getItem('uaic_lib'); if(lRaw) cfg.library = JSON.parse(lRaw); else cfg.library = [];
+    try {
+        if(localStorage.getItem('uaic_cfg_enc')) {
+            const pwd = prompt('🔐 输入数据保护密码:'); if(!pwd) return;
+            const c = await loadEncrypted('uaic_cfg', pwd); const s = await loadEncrypted('uaic_sess', pwd); const a = await loadEncrypted('uaic_act', pwd); const l = await loadEncrypted('uaic_lib', pwd);
+            if(!c) { toast('密码错误或数据损坏','e'); return; }
+            cfg = {...DEF, ...c}; if(l) cfg.library = l; encryptPwd = pwd; sess = s || []; activity = a || [];
+        } else {
+            cfg = {...DEF, ...JSON.parse(localStorage.getItem('uaic_cfg') || '{}')};
+            const sRaw = localStorage.getItem('uaic_sess'); if(sRaw) sess = JSON.parse(sRaw);
+            const aRaw = localStorage.getItem('uaic_act'); if(aRaw) activity = JSON.parse(aRaw);
+            const lRaw = localStorage.getItem('uaic_lib'); if(lRaw) cfg.library = JSON.parse(lRaw); else cfg.library = [];
+        }
+        await syncUIFromCfg();
+    } catch(e) { console.error('Load config error:', e); cfg = {...DEF}; }
 }
-await syncUIFromCfg();
-} catch(e) { console.error('Load config error:', e); cfg = {...DEF}; }
-}
+
 async function syncUIFromCfg() {
-['apiUrl','apiKey','cH','bgI','sP','cMod','sW','tS','tE','cCSS','fFam','mSel','codeFont','uiLang'].forEach(k => { const e=$(k); if(e) e.value=cfg[k]??DEF[k]; });
-if($('mSel')) $('mSel').value = cfg.mSel; if($('cMod')) $('cMod').value = cfg.cMod || cfg.mSel;
-['pCol','aCol'].forEach(k => { if($(k)) $(k).value = cfg[k]; });
-['mTok','mIn','dLim','rLim','mTur','aTime','fSiz','mRad','temp','tp','fp','pp'].forEach(k => { const e=$(k); if(e){ e.value=cfg[k]; uv(k+'V', e.value); } });
-['tSens','tTime','tComp','tMd','tHl','tStr','tMer','tKatex','tAutoSearch','tSearchSafe','tShowSearchBtn','tTypingAnim','tMsgAnim','tNotifySound','tTtsAuto'].forEach(k => {
-const e=$(k); if(e) (cfg[k]===true||cfg[k]==='true') ? e.classList.add('act') : e.classList.remove('act');
-});
-['typingSpeed','msgOpacity','blurStrength','maxWidth','lineHeight','paraSpacing','ttsRate'].forEach(k => {
-const e=$(k); if(e){ e.value=cfg[k]||DEF[k]; uv(k+'V', k==='lineHeight'||k==='ttsRate'?cfg[k]:cfg[k]+(k==='msgOpacity'?'%':'px')); }
-});
-if($('ttsVoiceSelect')) $('ttsVoiceSelect').value = cfg.ttsVoiceName || 'qianyue';
-if($('typingSpeed')) { $('typingSpeed').value = cfg.typingSpeed||15; uv('typingSpeedV', (cfg.typingSpeed||15)+'ms'); }
-if($('searchProvider')) $('searchProvider').value = cfg.searchProvider||'duckduckgo';
-if($('searchKey')) $('searchKey').value = cfg.searchKey||'';
-if($('searchNum')) { $('searchNum').value = cfg.searchNum||3; uv('searchNumV', cfg.searchNum||3); }
-if($('cursorStyle')) $('cursorStyle').value = cfg.cursorStyle||'line';
-['customSearchUrl','customSearchMethod','customSearchHeaders','customSearchBody','customSearchPath','customSearchTitle','customSearchLink','customSearchSnippet'].forEach(k => {
-const e=$(k); if(e) e.value = cfg[k] ?? DEF[k];
-});
-toggleSearchConfig();
-$('encStatus').textContent = cfg.encrypted ? '已加密' : '未加密'; $('encStatus').style.color = cfg.encrypted ? '#22c55e' : 'var(--text-s)';
-applyUI(); updateModelCaps(); renderActivity(); renderLibrary();
+    ['apiUrl','apiKey','cH','bgI','sP','cMod','sW','tS','tE','cCSS','fFam','mSel','codeFont','uiLang'].forEach(k => { const e=$(k); if(e) e.value=cfg[k]??DEF[k]; });
+    if($('mSel')) $('mSel').value = cfg.mSel; if($('cMod')) $('cMod').value = cfg.cMod || cfg.mSel;
+    ['pCol','aCol'].forEach(k => { if($(k)) $(k).value = cfg[k]; });
+    ['mTok','mIn','dLim','rLim','mTur','aTime','fSiz','mRad','temp','tp','fp','pp'].forEach(k => { const e=$(k); if(e){ e.value=cfg[k]; uv(k+'V', e.value); } });
+    ['tSens','tTime','tComp','tMd','tHl','tStr','tMer','tKatex','tAutoSearch','tSearchSafe','tShowSearchBtn','tTypingAnim','tMsgAnim','tNotifySound','tTtsAuto'].forEach(k => { 
+        const e=$(k); if(e) (cfg[k]===true||cfg[k]==='true') ? e.classList.add('act') : e.classList.remove('act'); 
+    });
+    ['typingSpeed','msgOpacity','blurStrength','maxWidth','lineHeight','paraSpacing','ttsRate'].forEach(k => {
+        const e=$(k); if(e){ e.value=cfg[k]||DEF[k]; uv(k+'V', k==='lineHeight'||k==='ttsRate'?cfg[k]:cfg[k]+(k==='msgOpacity'?'%':'px')); }
+    });
+    if($('ttsVoiceSelect')) $('ttsVoiceSelect').value = cfg.ttsVoiceName || 'qianyue';
+    if($('typingSpeed')) { $('typingSpeed').value = cfg.typingSpeed||15; uv('typingSpeedV', (cfg.typingSpeed||15)+'ms'); }
+    if($('searchProvider')) $('searchProvider').value = cfg.searchProvider||'duckduckgo';
+    if($('searchKey')) $('searchKey').value = cfg.searchKey||'';
+    if($('searchNum')) { $('searchNum').value = cfg.searchNum||3; uv('searchNumV', cfg.searchNum||3); }
+    if($('cursorStyle')) $('cursorStyle').value = cfg.cursorStyle||'line';
+    ['customSearchUrl','customSearchMethod','customSearchHeaders','customSearchBody','customSearchPath','customSearchTitle','customSearchLink','customSearchSnippet'].forEach(k => {
+        const e=$(k); if(e) e.value = cfg[k] ?? DEF[k];
+    });
+    toggleSearchConfig();
+    $('encStatus').textContent = cfg.encrypted ? '已加密' : '未加密'; $('encStatus').style.color = cfg.encrypted ? '#22c55e' : 'var(--text-s)';
+    applyUI(); updateModelCaps(); renderActivity(); renderLibrary();
 }
+
 async function saveCfg() {
-const c = {};
-['apiUrl','apiKey','cH','bgI','sP','mSel','cMod','pCol','aCol','sW','tS','tE','cCSS','fFam','user','ai','codeFont','ttsVoiceName','uiLang'].forEach(k => c[k] = $(k)?.value ?? DEF[k]);
-['mTok','mIn','dLim','rLim','mTur','aTime','fSiz','mRad','temp','tp','fp','pp'].forEach(k => c[k] = n($(k)?.value, DEF[k]));
-['tSens','tTime','tComp','tMd','tHl','tStr','tMer','tKatex','tAutoSearch','tSearchSafe','tShowSearchBtn','tTypingAnim','tMsgAnim','tNotifySound','tTtsAuto'].forEach(k => c[k] = $(k)?.classList.contains('act') ?? false);
-c.ttsRate = n($('ttsRate')?.value, 1.0);
-c.searchProvider = $('searchProvider')?.value || 'duckduckgo';
-c.searchKey = $('searchKey')?.value || '';
-c.searchNum = n($('searchNum')?.value, 3);
-c.customSearchUrl = $('customSearchUrl')?.value || '';
-c.customSearchMethod = $('customSearchMethod')?.value || 'GET';
-c.customSearchHeaders = $('customSearchHeaders')?.value || '';
-c.customSearchBody = $('customSearchBody')?.value || '';
-c.customSearchPath = $('customSearchPath')?.value || 'results';
-c.customSearchTitle = $('customSearchTitle')?.value || 'title';
-c.customSearchLink = $('customSearchLink')?.value || 'url';
-c.customSearchSnippet = $('customSearchSnippet')?.value || 'snippet';
-c.typingSpeed = n($('typingSpeed')?.value, 15);
-c.cursorStyle = $('cursorStyle')?.value || 'line';
-c.msgOpacity = n($('msgOpacity')?.value, 100);
-c.blurStrength = n($('blurStrength')?.value, 16);
-c.maxWidth = n($('maxWidth')?.value, 960);
-c.lineHeight = n($('lineHeight')?.value, 1.6);
-c.paraSpacing = n($('paraSpacing')?.value, 8);
-c.encrypted = cfg.encrypted; c.encPwdHash = cfg.encPwdHash; c.library = cfg.library || [];
-if(c.encrypted && encryptPwd) await saveEncrypted('uaic_cfg', c, encryptPwd); else { localStorage.setItem('uaic_cfg', JSON.stringify(c)); localStorage.removeItem('uaic_cfg_enc'); }
-cfg = c; return c;
+    const c = {};
+    ['apiUrl','apiKey','cH','bgI','sP','mSel','cMod','pCol','aCol','sW','tS','tE','cCSS','fFam','user','ai','codeFont','ttsVoiceName','uiLang'].forEach(k => c[k] = $(k)?.value ?? DEF[k]);
+    ['mTok','mIn','dLim','rLim','mTur','aTime','fSiz','mRad','temp','tp','fp','pp'].forEach(k => c[k] = n($(k)?.value, DEF[k]));
+    ['tSens','tTime','tComp','tMd','tHl','tStr','tMer','tKatex','tAutoSearch','tSearchSafe','tShowSearchBtn','tTypingAnim','tMsgAnim','tNotifySound','tTtsAuto'].forEach(k => c[k] = $(k)?.classList.contains('act') ?? false);
+    c.ttsRate = n($('ttsRate')?.value, 1.0);
+    c.searchProvider = $('searchProvider')?.value || 'duckduckgo';
+    c.searchKey = $('searchKey')?.value || '';
+    c.searchNum = n($('searchNum')?.value, 3);
+    c.customSearchUrl = $('customSearchUrl')?.value || '';
+    c.customSearchMethod = $('customSearchMethod')?.value || 'GET';
+    c.customSearchHeaders = $('customSearchHeaders')?.value || '';
+    c.customSearchBody = $('customSearchBody')?.value || '';
+    c.customSearchPath = $('customSearchPath')?.value || 'results';
+    c.customSearchTitle = $('customSearchTitle')?.value || 'title';
+    c.customSearchLink = $('customSearchLink')?.value || 'url';
+    c.customSearchSnippet = $('customSearchSnippet')?.value || 'snippet';
+    c.typingSpeed = n($('typingSpeed')?.value, 15);
+    c.cursorStyle = $('cursorStyle')?.value || 'line';
+    c.msgOpacity = n($('msgOpacity')?.value, 100);
+    c.blurStrength = n($('blurStrength')?.value, 16);
+    c.maxWidth = n($('maxWidth')?.value, 960);
+    c.lineHeight = n($('lineHeight')?.value, 1.6);
+    c.paraSpacing = n($('paraSpacing')?.value, 8);
+    c.encrypted = cfg.encrypted; c.encPwdHash = cfg.encPwdHash; c.library = cfg.library || [];
+    if(c.encrypted && encryptPwd) await saveEncrypted('uaic_cfg', c, encryptPwd); else { localStorage.setItem('uaic_cfg', JSON.stringify(c)); localStorage.removeItem('uaic_cfg_enc'); }
+    cfg = c; return c;
 }
+
 function applyUI() {
-document.documentElement.style.setProperty('--primary', cfg.pCol); document.documentElement.style.setProperty('--accent', cfg.aCol);
-document.documentElement.style.setProperty('--user-bg', `linear-gradient(135deg,${cfg.pCol},${cfg.aCol})`);
-document.documentElement.style.setProperty('--fw', cfg.fFam); document.documentElement.style.setProperty('--fs', cfg.fSiz + 'px');
-document.documentElement.style.setProperty('--r', cfg.mRad + 'px');
-document.documentElement.style.setProperty('--blur-strength', cfg.blurStrength + 'px');
-document.documentElement.style.setProperty('--msg-opacity', cfg.msgOpacity/100);
-document.documentElement.style.setProperty('--max-w', cfg.maxWidth + 'px');
-document.documentElement.style.setProperty('--line-height', cfg.lineHeight);
-document.documentElement.style.setProperty('--para-spacing', cfg.paraSpacing + 'px');
-document.documentElement.style.setProperty('--typing-speed', cfg.typingSpeed + 'ms');
-document.documentElement.style.setProperty('--cursor-style', cfg.cursorStyle);
-document.documentElement.style.setProperty('--code-font', cfg.codeFont || DEF.codeFont);
-if(cfg.bgI) document.documentElement.style.setProperty('--bg-img', `url('${cfg.bgI}')`); else document.documentElement.removeProperty('--bg-img');
-$('msgs').classList.toggle('compact', cfg.tComp === true);
-let s = document.getElementById('cCSSSt'); if(!s) { s = document.createElement('style'); s.id = 'cCSSSt'; document.head.appendChild(s); }
-s.textContent = cfg.cCSS || ''; $('cmod').textContent = cfg.cMod || cfg.mSel || '未配置';
-if($('searchBtn')) $('searchBtn').style.display = (cfg.tShowSearchBtn !== false) ? 'grid' : 'none';
-if(cfg.uiLang && $('uiLang')) { $('uiLang').value = cfg.uiLang; changeLang(cfg.uiLang, true); }
+    document.documentElement.style.setProperty('--primary', cfg.pCol); document.documentElement.style.setProperty('--accent', cfg.aCol);
+    document.documentElement.style.setProperty('--user-bg', `linear-gradient(135deg,${cfg.pCol},${cfg.aCol})`);
+    document.documentElement.style.setProperty('--fw', cfg.fFam); document.documentElement.style.setProperty('--fs', cfg.fSiz + 'px');
+    document.documentElement.style.setProperty('--r', cfg.mRad + 'px');
+    document.documentElement.style.setProperty('--blur-strength', cfg.blurStrength + 'px');
+    document.documentElement.style.setProperty('--msg-opacity', cfg.msgOpacity/100);
+    document.documentElement.style.setProperty('--max-w', cfg.maxWidth + 'px');
+    document.documentElement.style.setProperty('--line-height', cfg.lineHeight);
+    document.documentElement.style.setProperty('--para-spacing', cfg.paraSpacing + 'px');
+    document.documentElement.style.setProperty('--typing-speed', cfg.typingSpeed + 'ms');
+    document.documentElement.style.setProperty('--cursor-style', cfg.cursorStyle);
+    document.documentElement.style.setProperty('--code-font', cfg.codeFont || DEF.codeFont);
+    if(cfg.bgI) document.documentElement.style.setProperty('--bg-img', `url('${cfg.bgI}')`); else document.documentElement.removeProperty('--bg-img');
+    $('msgs').classList.toggle('compact', cfg.tComp === true);
+    let s = document.getElementById('cCSSSt'); if(!s) { s = document.createElement('style'); s.id = 'cCSSSt'; document.head.appendChild(s); }
+    s.textContent = cfg.cCSS || ''; $('cmod').textContent = cfg.cMod || cfg.mSel || '未配置';
+    if($('searchBtn')) $('searchBtn').style.display = (cfg.tShowSearchBtn !== false) ? 'grid' : 'none';
+    if(cfg.uiLang && $('uiLang')) { $('uiLang').value = cfg.uiLang; changeLang(cfg.uiLang, true); }
 }
+
 function aCodeFont(font) { document.documentElement.style.setProperty('--code-font', font); cfg.codeFont = font; saveCfg(); }
 function aCursor(style) { document.documentElement.style.setProperty('--cursor-style', style); document.querySelectorAll('.typing-cursor').forEach(el => { el.className = 'typing-cursor ' + style; }); }
+
 // ============ 流程图/图表实时渲染 (Mermaid) ============
 async function renderMermaidBlock(id, btn, isAuto=false) {
-const container = document.getElementById(id + '-container');
-if (!container) return;
-const code = container.querySelector('.mermaid-source').value;
-const output = document.getElementById(id);
-if(btn) btn.textContent = '⏳ 处理中...';
-try {
-mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
-const { svg } = await mermaid.render(id, code);
-output.innerHTML = svg;
-if (btn) { if(isAuto) btn.style.display = 'none'; else btn.textContent = '✅ 已渲染'; }
-} catch (e) {
-const isFlowchart = /^(graph|sequenceDiagram|classDiagram|stateDiagram|gantt|pie|flowchart|erDiagram|gitGraph|requirementDiagram)/im.test(code);
-const isHtml = /<svg|<html/i.test(code);
-if (!isFlowchart && !isHtml) {
-if(!isAuto) toast("停下，不支持操作", 'e');
-output.innerHTML = '<span style="color:#ef4444">无效流程图格式</span>';
-if(btn) btn.textContent = '❌ 不支持';
-} else {
-output.innerHTML = '<span style="color:#ef4444">渲染失败: ' + e.message + '</span>';
-if(btn) btn.textContent = '🔄 重试';
+    const container = document.getElementById(id + '-container');
+    if (!container) return;
+    const code = container.querySelector('.mermaid-source').value;
+    const output = document.getElementById(id);
+    
+    if(btn) btn.textContent = '⏳ 处理中...';
+    try {
+        mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+        const { svg } = await mermaid.render(id, code);
+        output.innerHTML = svg;
+        if (btn) { if(isAuto) btn.style.display = 'none'; else btn.textContent = '✅ 已渲染'; }
+    } catch (e) {
+        const isFlowchart = /^(graph|sequenceDiagram|classDiagram|stateDiagram|gantt|pie|flowchart|erDiagram|gitGraph|requirementDiagram)/im.test(code);
+        const isHtml = /<svg|<html/i.test(code);
+        if (!isFlowchart && !isHtml) {
+            if(!isAuto) toast("停下，不支持操作", 'e');
+            output.innerHTML = '<span style="color:#ef4444">无效流程图格式</span>';
+            if(btn) btn.textContent = '❌ 不支持';
+        } else {
+            output.innerHTML = '<span style="color:#ef4444">渲染失败: ' + e.message + '</span>';
+            if(btn) btn.textContent = '🔄 重试';
+        }
+    }
 }
-}
-}
+
 // ============ 模型能力检测 ============
 function getModelCapabilities(model) { const m = model.toLowerCase(); return { vision: /gpt-4o|gpt-4-turbo|claude-3|qwen-vl|gemini/.test(m), files: /gpt-4o|claude-3|qwen-vl/.test(m), function_call: /gpt-4|gpt-3.5-turbo-0613|claude/.test(m) }; }
 function updateModelCaps() { const model = $('cMod')?.value || $('mSel')?.value || 'gpt-4o'; const caps = getModelCapabilities(model); const tags = []; if(caps.vision) tags.push('🖼️'); if(caps.files) tags.push('📎'); if(caps.function_call) tags.push('⚙️'); $('modelCaps').textContent = tags.length ? tags.join(' ') : ''; }
+
 // ============ 🔍 网络搜索引擎 ============
 const SearchEngine = {
-proxies: ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?', 'https://cors.bridged.cc/'],
-sanitize(text, safeMode = true) {
-if (!safeMode || typeof DOMPurify === 'undefined') return String(text).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-return DOMPurify.sanitize(String(text), { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
-},
-truncate(text, maxLen = 250) { return String(text).length > maxLen ? String(text).slice(0, maxLen) + '...' : String(text); },
-async ddg(query, num, safeMode) {
-const url = `https://duckduckgo.com/html?q=${encodeURIComponent(query)}&kl=cn`;
-let lastErr;
-for (const proxy of this.proxies) {
-try {
-const res = await fetch(proxy + encodeURIComponent(url), { signal: AbortSignal.timeout(4000), headers: {'Accept':'text/html'} });
-if (!res.ok) continue;
-const html = await res.text();
-const doc = new DOMParser().parseFromString(html, 'text/html');
-const results = [];
-doc.querySelectorAll('.result').forEach(item => {
-if(results.length >= num) return;
-const a = item.querySelector('.result__a');
-const s = item.querySelector('.result__snippet');
-if(a && a.href) {
-let link = a.href.includes('duckduckgo.com/l.php') ? new URL(a.href).searchParams.get('u') || a.href : a.href;
-results.push({ title: this.sanitize(a.textContent?.trim(), safeMode), link, snippet: this.sanitize(s?.textContent?.trim() || '', safeMode), source: 'DuckDuckGo' });
-}
-});
-return results.length ? results : null;
-} catch(e) { lastErr = e; }
-}
-throw lastErr || new Error('DuckDuckGo 代理全部不可用');
-},
-async wikipedia(query, num, safeMode) {
-const res = await fetch(`https://zh.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`);
-const data = await res.json();
-return (data.query?.search || []).slice(0, num).map(r => ({ title: this.sanitize(r.title, safeMode), link: `https://zh.wikipedia.org/wiki/${encodeURIComponent(r.title)}`, snippet: this.sanitize(r.snippet?.replace(/<[^>]+>/g, ''), safeMode), source: 'Wikipedia' }));
-},
-async github(query, num, safeMode) {
-const res = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=${num}`);
-const data = await res.json();
-return (data.items || []).map(r => ({ title: this.sanitize(r.full_name, safeMode), link: r.html_url, snippet: this.sanitize(r.description || '无描述', safeMode), source: 'GitHub' }));
-},
-async custom(query, num, safeMode, cfg) {
-const urlTpl = cfg.customSearchUrl || '';
-const method = cfg.customSearchMethod || 'GET';
-const headers = {};
-try { Object.assign(headers, JSON.parse(cfg.customSearchHeaders || '{}')); } catch(e) {}
-if(method==='POST') headers['Content-Type'] = 'application/json';
-const finalUrl = urlTpl.replace(/{query}/g, encodeURIComponent(query)).replace(/{num}/g, num);
-let body = null;
-if (method === 'POST' && cfg.customSearchBody) {
-try {
-const bodyTpl = cfg.customSearchBody.replace(/{query}/g, query).replace(/{num}/g, num);
-body = JSON.parse(bodyTpl);
-} catch(e) { throw new Error('请求体 JSON 格式错误: ' + e.message); }
-}
-const res = await fetch(finalUrl, { method, headers, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(5000) });
-if (!res.ok) throw new Error(`HTTP ${res.status}`);
-const data = await res.json();
-const path = (cfg.customSearchPath || 'results').split('.');
-let arr = data;
-for (const p of path) { if (arr && typeof arr === 'object' && p in arr) arr = arr[p]; else { arr = null; break; } }
-if (!Array.isArray(arr)) throw new Error('未找到结果数组，请检查路径配置');
-const titleKey = cfg.customSearchTitle || 'title';
-const linkKey = cfg.customSearchLink || 'url';
-const snippetKey = cfg.customSearchSnippet || 'snippet';
-return arr.slice(0, num).map(r => ({ title: this.sanitize(r?.[titleKey] || '', safeMode), link: r?.[linkKey] || '#', snippet: this.sanitize(r?.[snippetKey] || '', safeMode), source: 'Custom' }));
-},
-async search(query, cfg) {
-const num = cfg.searchNum || 3; const safe = cfg.tSearchSafe !== false;
-const key = `${cfg.searchProvider}:${query}`;
-if (searchCache.has(key) && Date.now() - searchCache.get(key).t < 300000) return searchCache.get(key).r;
-let results = [];
-const p = cfg.searchProvider;
-if (p === 'duckduckgo') results = await this.ddg(query, num, safe);
-else if (p === 'wikipedia') results = await this.wikipedia(query, num, safe);
-else if (p === 'github') results = await this.github(query, num, safe);
-else if (p === 'custom') results = await this.custom(query, num, safe, cfg);
-else throw new Error('不支持的提供商');
-results = Array.isArray(results) ? results : [];
-if(!results.length) throw new Error('未找到结果或解析失败');
-searchCache.set(key, { r: results, t: Date.now() });
-UsageTracker.track('search', { search: true, cache: searchCache.size });
-return results;
-},
-formatPromptAppend(results, query, safeMode=true) {
-if (!Array.isArray(results) || !results.length) return `
-【网络搜索 "${esc(query)}" 无结果，请基于已有知识回答】`;
-const fmt = results.map((r,i)=>`[${i+1}]《${this.sanitize(r.title, safeMode)}》(${r.source})
-${this.truncate(this.sanitize(r.snippet, safeMode), 180)}
-链接: ${r.link}`).join('
-');
-return `
---- 🌐 网络搜索结果 (仅供参考) ---
-${fmt}
---- 🌐 结束 ---
-请基于以上信息回答，引用时标注[1][2]。如信息冲突请说明。`;
-},
-shouldAutoSearch(text, cfg) {
-if(cfg.tAutoSearch===false) return false;
-if(text.length>200 || /```|function|class|import/.test(text)) return false;
-return ['搜索','查一下','查询','最新','今天','现在','实时','股价','天气','新闻'].some(k => text.toLowerCase().includes(k));
-}
+    proxies: ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?', 'https://cors.bridged.cc/'],
+    sanitize(text, safeMode = true) {
+        if (!safeMode || typeof DOMPurify === 'undefined') return String(text).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        return DOMPurify.sanitize(String(text), { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    },
+    truncate(text, maxLen = 250) { return String(text).length > maxLen ? String(text).slice(0, maxLen) + '...' : String(text); },
+    async ddg(query, num, safeMode) {
+        const url = `https://duckduckgo.com/html?q=${encodeURIComponent(query)}&kl=cn`;
+        let lastErr;
+        for (const proxy of this.proxies) {
+            try {
+                const res = await fetch(proxy + encodeURIComponent(url), { signal: AbortSignal.timeout(4000), headers: {'Accept':'text/html'} });
+                if (!res.ok) continue;
+                const html = await res.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const results = [];
+                doc.querySelectorAll('.result').forEach(item => {
+                    if(results.length >= num) return;
+                    const a = item.querySelector('.result__a');
+                    const s = item.querySelector('.result__snippet');
+                    if(a && a.href) {
+                        let link = a.href.includes('duckduckgo.com/l.php') ? new URL(a.href).searchParams.get('u') || a.href : a.href;
+                        results.push({ title: this.sanitize(a.textContent?.trim(), safeMode), link, snippet: this.sanitize(s?.textContent?.trim() || '', safeMode), source: 'DuckDuckGo' });
+                    }
+                });
+                return results.length ? results : null;
+            } catch(e) { lastErr = e; }
+        }
+        throw lastErr || new Error('DuckDuckGo 代理全部不可用');
+    },
+    async wikipedia(query, num, safeMode) {
+        const res = await fetch(`https://zh.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`);
+        const data = await res.json();
+        return (data.query?.search || []).slice(0, num).map(r => ({ title: this.sanitize(r.title, safeMode), link: `https://zh.wikipedia.org/wiki/${encodeURIComponent(r.title)}`, snippet: this.sanitize(r.snippet?.replace(/<[^>]+>/g, ''), safeMode), source: 'Wikipedia' }));
+    },
+    async github(query, num, safeMode) {
+        const res = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=${num}`);
+        const data = await res.json();
+        return (data.items || []).map(r => ({ title: this.sanitize(r.full_name, safeMode), link: r.html_url, snippet: this.sanitize(r.description || '无描述', safeMode), source: 'GitHub' }));
+    },
+    async custom(query, num, safeMode, cfg) {
+      const urlTpl = cfg.customSearchUrl || '';
+      const method = cfg.customSearchMethod || 'GET';
+      const headers = {};
+      try { Object.assign(headers, JSON.parse(cfg.customSearchHeaders || '{}')); } catch(e) {}
+      if(method==='POST') headers['Content-Type'] = 'application/json';
+      const finalUrl = urlTpl.replace(/{query}/g, encodeURIComponent(query)).replace(/{num}/g, num);
+      let body = null;
+      if (method === 'POST' && cfg.customSearchBody) {
+        try {
+          const bodyTpl = cfg.customSearchBody.replace(/{query}/g, query).replace(/{num}/g, num);
+          body = JSON.parse(bodyTpl);
+        } catch(e) { throw new Error('请求体 JSON 格式错误: ' + e.message); }
+      }
+      const res = await fetch(finalUrl, { method, headers, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(5000) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const path = (cfg.customSearchPath || 'results').split('.');
+      let arr = data;
+      for (const p of path) { if (arr && typeof arr === 'object' && p in arr) arr = arr[p]; else { arr = null; break; } }
+      if (!Array.isArray(arr)) throw new Error('未找到结果数组，请检查路径配置');
+      const titleKey = cfg.customSearchTitle || 'title';
+      const linkKey = cfg.customSearchLink || 'url';
+      const snippetKey = cfg.customSearchSnippet || 'snippet';
+      return arr.slice(0, num).map(r => ({ title: this.sanitize(r?.[titleKey] || '', safeMode), link: r?.[linkKey] || '#', snippet: this.sanitize(r?.[snippetKey] || '', safeMode), source: 'Custom' }));
+    },
+    async search(query, cfg) {
+        const num = cfg.searchNum || 3; const safe = cfg.tSearchSafe !== false;
+        const key = `${cfg.searchProvider}:${query}`;
+        if (searchCache.has(key) && Date.now() - searchCache.get(key).t < 300000) return searchCache.get(key).r;
+        let results = [];
+        const p = cfg.searchProvider;
+        if (p === 'duckduckgo') results = await this.ddg(query, num, safe);
+        else if (p === 'wikipedia') results = await this.wikipedia(query, num, safe);
+        else if (p === 'github') results = await this.github(query, num, safe);
+        else if (p === 'custom') results = await this.custom(query, num, safe, cfg);
+        else throw new Error('不支持的提供商');
+        results = Array.isArray(results) ? results : [];
+        if(!results.length) throw new Error('未找到结果或解析失败');
+        searchCache.set(key, { r: results, t: Date.now() });
+        UsageTracker.track('search', { search: true, cache: searchCache.size });
+        return results;
+    },
+    formatPromptAppend(results, query, safeMode=true) {
+        if (!Array.isArray(results) || !results.length) return `\n\n【网络搜索 "${esc(query)}" 无结果，请基于已有知识回答】`;
+        const fmt = results.map((r,i)=>`[${i+1}]《${this.sanitize(r.title, safeMode)}》(${r.source})\n${this.truncate(this.sanitize(r.snippet, safeMode), 180)}\n链接: ${r.link}`).join('\n\n');
+        return `\n\n--- 🌐 网络搜索结果 (仅供参考) ---\n${fmt}\n--- 🌐 结束 ---\n请基于以上信息回答，引用时标注[1][2]。如信息冲突请说明。`;
+    },
+    shouldAutoSearch(text, cfg) {
+        if(cfg.tAutoSearch===false) return false;
+        if(text.length>200 || /```|function|class|import/.test(text)) return false;
+        return ['搜索','查一下','查询','最新','今天','现在','实时','股价','天气','新闻'].some(k => text.toLowerCase().includes(k));
+    }
 };
+
 // ============ 🔍 搜索预览UI管理器 ============
 const SearchUI = {
-container: $('searchPreview'),
-state: { loading: false, results: [], selected: new Set(), query: '', startTime: 0 },
-render() {
-const { loading, results, selected, query, startTime } = this.state;
-if (loading) { this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">🔍 搜索中...</span><div class="sp-meta"><span class="sp-badge load">加载中</span></div></div><div class="sp-loading"><div class="sp-spinner"></div>正在获取实时数据...</div></div>`; return; }
-if (!Array.isArray(results) || !results.length) return this.container.innerHTML = '';
-const elapsed = Date.now() - startTime;
-this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">🔍 搜索: "${esc(query)}"</span><div class="sp-meta"><span class="sp-badge ok">${results.length} 条结果</span><span style="color:var(--text-s)">${elapsed}ms</span></div></div><div class="sp-list">${results.map((r,i)=>`<div class="sp-card ${selected.has(i)?'':'disabled'}" data-idx="${i}"><input type="checkbox" class="sp-check" ${selected.has(i)?'checked':''} onclick="SearchUI.toggle(${i})"><div class="sp-info"><div class="sp-domain">${esc(r.source)}</div><div class="sp-title">${esc(r.title)}</div><div class="sp-snippet">${esc(r.snippet)}</div></div></div>`).join('')}</div><div class="sp-actions"><button class="sp-btn" onclick="SearchUI.clear()">✕ 清除</button><button class="sp-btn" onclick="SearchUI.retry()">🔄 重试</button><button class="sp-btn confirm" onclick="SearchUI.confirm()">✅ 确认并发送 (${selected.size})</button></div><div class="sp-footer">💡 勾选需要的结果。结果将安全追加至您的输入末尾。</div></div>`;
-},
-async start(query) {
-this.state = { loading: true, results: [], selected: new Set(), query, startTime: Date.now() };
-this.render();
-try {
-const c = await saveCfg();
-const res = await SearchEngine.search(query, c);
-this.state = { ...this.state, loading: false, results: res, selected: new Set(res.map((_,i)=>i)) };
-this.render(); logActivity('search', `${c.searchProvider}: ${query} → ${res.length} results`, 's');
-} catch(e) {
-this.state.loading = false;
-this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">❌ 搜索失败</span><span class="sp-badge err">ERROR</span></div><div class="sp-empty">${esc(e.message)}<br><button class="sp-btn" style="margin-top:8px" onclick="SearchUI.retry()">🔄 重试</button></div></div>`;
-logActivity('search', e.message, 'e');
-}
-},
-toggle(idx) {
-if(!Array.isArray(this.state.results)) return;
-this.state.selected.has(idx) ? this.state.selected.delete(idx) : this.state.selected.add(idx);
-this.render();
-},
-clear() { this.container.innerHTML=''; pendingSearch=null; $('searchBtn').disabled=false; },
-retry() { if(this.state.query) this.start(this.state.query); },
-confirm() {
-if(this.state.selected.size===0) { toast('请至少选择1条结果', 'w'); return; }
-pendingSearch = { query: this.state.query, results: this.state.results.filter((_,i) => this.state.selected.has(i)) || [] };
-this.clear(); $('searchBtn').disabled = false;
-toast(`已附加 ${pendingSearch.results.length} 条结果，点击发送 ➤`, 's');
-}
+    container: $('searchPreview'),
+    state: { loading: false, results: [], selected: new Set(), query: '', startTime: 0 },
+    render() {
+        const { loading, results, selected, query, startTime } = this.state;
+        if (loading) { this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">🔍 搜索中...</span><div class="sp-meta"><span class="sp-badge load">加载中</span></div></div><div class="sp-loading"><div class="sp-spinner"></div>正在获取实时数据...</div></div>`; return; }
+        if (!Array.isArray(results) || !results.length) return this.container.innerHTML = '';
+        const elapsed = Date.now() - startTime;
+        this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">🔍 搜索: "${esc(query)}"</span><div class="sp-meta"><span class="sp-badge ok">${results.length} 条结果</span><span style="color:var(--text-s)">${elapsed}ms</span></div></div><div class="sp-list">${results.map((r,i)=>`<div class="sp-card ${selected.has(i)?'':'disabled'}" data-idx="${i}"><input type="checkbox" class="sp-check" ${selected.has(i)?'checked':''} onclick="SearchUI.toggle(${i})"><div class="sp-info"><div class="sp-domain">${esc(r.source)}</div><div class="sp-title">${esc(r.title)}</div><div class="sp-snippet">${esc(r.snippet)}</div></div></div>`).join('')}</div><div class="sp-actions"><button class="sp-btn" onclick="SearchUI.clear()">✕ 清除</button><button class="sp-btn" onclick="SearchUI.retry()">🔄 重试</button><button class="sp-btn confirm" onclick="SearchUI.confirm()">✅ 确认并发送 (${selected.size})</button></div><div class="sp-footer">💡 勾选需要的结果。结果将安全追加至您的输入末尾。</div></div>`;
+    },
+    async start(query) {
+        this.state = { loading: true, results: [], selected: new Set(), query, startTime: Date.now() };
+        this.render();
+        try {
+            const c = await saveCfg();
+            const res = await SearchEngine.search(query, c);
+            this.state = { ...this.state, loading: false, results: res, selected: new Set(res.map((_,i)=>i)) };
+            this.render(); logActivity('search', `${c.searchProvider}: ${query} → ${res.length} results`, 's');
+        } catch(e) {
+            this.state.loading = false;
+            this.container.innerHTML = `<div class="sp-container"><div class="sp-header"><span class="sp-title">❌ 搜索失败</span><span class="sp-badge err">ERROR</span></div><div class="sp-empty">${esc(e.message)}<br><button class="sp-btn" style="margin-top:8px" onclick="SearchUI.retry()">🔄 重试</button></div></div>`;
+            logActivity('search', e.message, 'e');
+        }
+    },
+    toggle(idx) { 
+        if(!Array.isArray(this.state.results)) return;
+        this.state.selected.has(idx) ? this.state.selected.delete(idx) : this.state.selected.add(idx); 
+        this.render(); 
+    },
+    clear() { this.container.innerHTML=''; pendingSearch=null; $('searchBtn').disabled=false; },
+    retry() { if(this.state.query) this.start(this.state.query); },
+    confirm() {
+        if(this.state.selected.size===0) { toast('请至少选择1条结果', 'w'); return; }
+        pendingSearch = { query: this.state.query, results: this.state.results.filter((_,i) => this.state.selected.has(i)) || [] };
+        this.clear(); $('searchBtn').disabled = false;
+        toast(`已附加 ${pendingSearch.results.length} 条结果，点击发送 ➤`, 's');
+    }
 };
+
 // ============ Markdown 渲染 ============
 function escapeHtml(unsafe) {
-return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 function renderMermaid(content) {
-if(!cfg.tMer || window._mermaidErr || typeof mermaid==='undefined') return content;
-try {
-return content.replace(/```mermaid
-([\s\S]*?)```/g, (match, code) => {
-const id = 'mermaid-' + Math.random().toString(36).slice(2);
-return `<div class="mermaid-container" id="${id}-container"><div id="${id}" class="mermaid-output"></div><div class="mermaid-actions"><button class="mxb" onclick="renderMermaidBlock('${id}', this)">🔄 转换/渲染</button></div><textarea class="mermaid-source" style="display:none">${escapeHtml(code)}</textarea></div>`;
-});
-} catch(e) { return content; }
+    if(!cfg.tMer || window._mermaidErr || typeof mermaid==='undefined') return content;
+    try {
+        return content.replace(/```mermaid\n([\s\S]*?)```/g, (match, code) => {
+            const id = 'mermaid-' + Math.random().toString(36).slice(2);
+            return `<div class="mermaid-container" id="${id}-container"><div id="${id}" class="mermaid-output"></div><div class="mermaid-actions"><button class="mxb" onclick="renderMermaidBlock('${id}', this)">🔄 转换/渲染</button></div><textarea class="mermaid-source" style="display:none">${escapeHtml(code)}</textarea></div>`;
+        });
+    } catch(e) { return content; }
 }
 function renderMath(content) {
-if(!cfg.tKatex || window._katexErr || typeof katex==='undefined') return content;
-try {
-let h = content.replace(/\$\$([\s\S]+?)\$\$/g, (m, eq) => `<div class="katex-display">${katex.renderToString(eq.trim(), { throwOnError: false, displayMode: true })}</div>`);
-h = h.replace(/(?<!\$)\$([^\$
-]+?)\$(?!\$)/g, (m, eq) => katex.renderToString(eq, { throwOnError: false, displayMode: false }));
-return h;
-} catch(e) { return content; }
+    if(!cfg.tKatex || window._katexErr || typeof katex==='undefined') return content;
+    try {
+        let h = content.replace(/\$\$([\s\S]+?)\$\$/g, (m, eq) => `<div class="katex-display">${katex.renderToString(eq.trim(), { throwOnError: false, displayMode: true })}</div>`);
+        h = h.replace(/(?<!\$)\$([^\$\n]+?)\$(?!\$)/g, (m, eq) => katex.renderToString(eq, { throwOnError: false, displayMode: false }));
+        return h;
+    } catch(e) { return content; }
 }
 function showSourceDetail(idx) {
-const s = sess.find(x=>x.id===cur); if(!s) return;
-const msg = [...s.msgs].reverse().find(m => Array.isArray(m.rawResults) && m.rawResults[idx-1]);
-if(!msg) return toast('未找到来源数据','w');
-const r = msg.rawResults[idx-1];
-$('sourceContent').innerHTML = `<div style="margin-bottom:12px"><strong style="color:var(--primary)">${esc(r.title)}</strong></div><div style="margin-bottom:8px"><span style="background:var(--search-bg);padding:2px 6px;border-radius:4px;font-size:11px">${esc(r.source)}</span></div><div style="margin-bottom:12px;color:var(--text-s)">${esc(r.snippet)}</div><a href="${esc(r.link)}" target="_blank" style="color:var(--accent);word-break:break-all">${esc(r.link)}</a><div class="search-disclaimer" style="margin-top:16px">⚠️ 来源内容由第三方提供，请自行判断可信度</div>`;
-$('sourceModal').classList.add('act');
+    const s = sess.find(x=>x.id===cur); if(!s) return;
+    const msg = [...s.msgs].reverse().find(m => Array.isArray(m.rawResults) && m.rawResults[idx-1]);
+    if(!msg) return toast('未找到来源数据','w');
+    const r = msg.rawResults[idx-1];
+    $('sourceContent').innerHTML = `<div style="margin-bottom:12px"><strong style="color:var(--primary)">${esc(r.title)}</strong></div><div style="margin-bottom:8px"><span style="background:var(--search-bg);padding:2px 6px;border-radius:4px;font-size:11px">${esc(r.source)}</span></div><div style="margin-bottom:12px;color:var(--text-s)">${esc(r.snippet)}</div><a href="${esc(r.link)}" target="_blank" style="color:var(--accent);word-break:break-all">${esc(r.link)}</a><div class="search-disclaimer" style="margin-top:16px">⚠️ 来源内容由第三方提供，请自行判断可信度</div>`;
+    $('sourceModal').classList.add('act');
 }
 function rMd(text) {
-if(window._markedErr || typeof marked==='undefined') return `<div style="white-space:pre-wrap">${esc(text)}</div>`;
-try {
-marked.setOptions({ highlight: (cfg.tHl && !window._hlErr && typeof hljs!=='undefined') ? (code,lang)=>lang&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang}).value:hljs.highlightAuto(code).value:undefined, breaks: true, gfm: true });
-let h = marked.parse(text);
-h = h.replace(/<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,(m,lang,code)=>`<div class="cb"><div class="chd"><span>${lang}</span><div style="display:flex;gap:6px"><button class="ccp" onclick="cpCode(this)">📋</button><button class="ccp" style="background:var(--accent);color:#000" onclick="addToLibrary('代码',this.closest('.cb').querySelector('.cbd').innerText)">💾</button></div></div><div class="cbd"><pre><code class="language-${lang}">${escapeHtml(code)}</code></pre></div></div>`);
-h = h.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g,(m,code)=>`<div class="cb"><div class="chd"><span>code</span><div style="display:flex;gap:6px"><button class="ccp" onclick="cpCode(this)">📋</button><button class="ccp" style="background:var(--accent);color:#000" onclick="addToLibrary('代码',this.closest('.cb').querySelector('.cbd').innerText)">💾</button></div></div><div class="cbd"><pre><code>${escapeHtml(code)}</code></pre></div></div>`);
-h = h.replace(/<table([\s\S]*?)<\/table>/g,(m,attrs)=>`<div style="position:relative"><button class="lib-save-btn" onclick="addToLibrary('表格',this.closest('div').querySelector('table').outerHTML)">💾</button><table${attrs}</table></div>`);
-h = h.replace(/<code>(?!<)([\s\S]*?)(?!<\/pre>)<\/code>/g, '<code class="ic">$1</code>');
-h = renderMermaid(h);
-if(cfg.tKatex) h = renderMath(h);
-return h;
-} catch(e) { return `<div style="white-space:pre-wrap">${esc(text)}</div>`; }
+    if(window._markedErr || typeof marked==='undefined') return `<div style="white-space:pre-wrap">${esc(text)}</div>`;
+    try {
+        marked.setOptions({ highlight: (cfg.tHl && !window._hlErr && typeof hljs!=='undefined') ? (code,lang)=>lang&&hljs.getLanguage(lang)?hljs.highlight(code,{language:lang}).value:hljs.highlightAuto(code).value:undefined, breaks: true, gfm: true });
+        let h = marked.parse(text);
+        h = h.replace(/<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,(m,lang,code)=>`<div class="cb"><div class="chd"><span>${lang}</span><div style="display:flex;gap:6px"><button class="ccp" onclick="cpCode(this)">📋</button><button class="ccp" style="background:var(--accent);color:#000" onclick="addToLibrary('代码',this.closest('.cb').querySelector('.cbd').innerText)">💾</button></div></div><div class="cbd"><pre><code class="language-${lang}">${escapeHtml(code)}</code></pre></div></div>`);
+        h = h.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g,(m,code)=>`<div class="cb"><div class="chd"><span>code</span><div style="display:flex;gap:6px"><button class="ccp" onclick="cpCode(this)">📋</button><button class="ccp" style="background:var(--accent);color:#000" onclick="addToLibrary('代码',this.closest('.cb').querySelector('.cbd').innerText)">💾</button></div></div><div class="cbd"><pre><code>${escapeHtml(code)}</code></pre></div></div>`);
+        h = h.replace(/<table([\s\S]*?)<\/table>/g,(m,attrs)=>`<div style="position:relative"><button class="lib-save-btn" onclick="addToLibrary('表格',this.closest('div').querySelector('table').outerHTML)">💾</button><table${attrs}</table></div>`);
+        h = h.replace(/<code>(?!<)([\s\S]*?)(?!<\/pre>)<\/code>/g, '<code class="ic">$1</code>');
+        h = renderMermaid(h);
+        if(cfg.tKatex) h = renderMath(h);
+        return h;
+    } catch(e) { return `<div style="white-space:pre-wrap">${esc(text)}</div>`; }
 }
 function cpCode(btn) { navigator.clipboard.writeText(btn.closest('.cb').querySelector('.cbd').innerText).then(()=>{btn.textContent='✅';setTimeout(()=>btn.textContent='📋',1200)}).catch(()=>toast('复制失败','e')); }
+
 // ============ 消息渲染 ============
 const WELCOME_HTML = `<div class="wel" id="wel"><div class="wi">🚀</div><h2>欢迎使用 Ultra AI + Web Search</h2><p>支持实时网络搜索增强。配置搜索服务后，输入"搜索/查一下"自动获取最新信息。</p><div class="sgs"><div class="sg" onclick="qSend('搜索今天特斯拉股价')">📈 实时股价</div><div class="sg" onclick="qSend('查一下最新 AI 新闻')">📰 新闻资讯</div><div class="sg" onclick="qSend('用Python写一个异步爬虫框架')">💻 代码生成</div></div></div>`;
+
 function rMsgs() {
-const box = $('msgs'); if(!box) return; const s = sess.find(x=>x.id===cur);
-if(!s || !s.msgs.length) { box.innerHTML = WELCOME_HTML; return; }
-let html = '';
-s.msgs.forEach((m,i) => {
-const u = m.role==='user'; const nm = u ? cfg.user : cfg.ai;
-let content = m.content;
-if (typeof content === 'object' && content.text) content = content.text;
-const ttsBtn = u ? '' : `<button class="mxb tts-btn" data-tts="true" data-msg-idx="${i}" title="朗读">🔊</button>`;
-const ct = u ? `<div class="mt">${esc(content)}</div>` : (cfg.tMd ? `<div class="mt">${rMd(content)}</div>` : `<div class="mt">${esc(content)}</div>`);
-html += `<div class="msg ${u?'u':'ai'}"><div class="ma">${u?'👤':'🤖'}</div><div class="mw"><div class="mm">${nm}</div><div class="mc">${ct}</div></div><div class="mx">${ttsBtn}<button class="mxb" onclick="cpMsg(this,${i})">📋</button>${!u?`<button class="mxb" onclick="regen()">🔄</button>`:''}<button class="mxb" onclick="editMsg(${i})">✏️</button><button class="mxb del" onclick="delSingleMsg(${i})">🗑️</button></div></div>`;
-}); box.innerHTML = html; stBot();
-setTimeout(() => {
-document.querySelectorAll('.mermaid-container').forEach(container => {
-const id = container.id.replace('-container', '');
-const btn = container.querySelector('button');
-renderMermaidBlock(id, btn, true);
-});
-}, 100);
+    const box = $('msgs'); if(!box) return; const s = sess.find(x=>x.id===cur);
+    if(!s || !s.msgs.length) { box.innerHTML = WELCOME_HTML; return; }
+    let html = '';
+    s.msgs.forEach((m,i) => {
+        const u = m.role==='user'; const nm = u ? cfg.user : cfg.ai; 
+        let content = m.content;
+        if (typeof content === 'object' && content.text) content = content.text;
+        const ttsBtn = u ? '' : `<button class="mxb tts-btn" data-tts="true" data-msg-idx="${i}" title="朗读">🔊</button>`;
+        const ct = u ? `<div class="mt">${esc(content)}</div>` : (cfg.tMd ? `<div class="mt">${rMd(content)}</div>` : `<div class="mt">${esc(content)}</div>`);
+        html += `<div class="msg ${u?'u':'ai'}"><div class="ma">${u?'👤':'🤖'}</div><div class="mw"><div class="mm">${nm}</div><div class="mc">${ct}</div></div><div class="mx">${ttsBtn}<button class="mxb" onclick="cpMsg(this,${i})">📋</button>${!u?`<button class="mxb" onclick="regen()">🔄</button>`:''}<button class="mxb" onclick="editMsg(${i})">✏️</button><button class="mxb del" onclick="delSingleMsg(${i})">🗑️</button></div></div>`;
+    }); box.innerHTML = html; stBot();
+    setTimeout(() => {
+        document.querySelectorAll('.mermaid-container').forEach(container => {
+            const id = container.id.replace('-container', '');
+            const btn = container.querySelector('button');
+            renderMermaidBlock(id, btn, true);
+        });
+    }, 100);
 }
+
 function addMsg(role, content, stream=false) {
-const box = $('msgs'); if(box) { const wel = box.querySelector('.wel'); if(wel) wel.remove(); }
-const div = document.createElement('div'); div.className = `msg ${role==='user'?'u':'ai'}${stream&&cfg.tTypingAnim?' msg-streaming':''}`;
-const nm = role==='user' ? cfg.user : cfg.ai;
-let ct = stream && cfg.tTypingAnim ? '<div class="mt"><span class="typing-content"></span><span class="typing-cursor '+cfg.cursorStyle+'"></span></div>' : (cfg.tMd ? `<div class="mt">${rMd(content)}</div>` : `<div class="mt">${esc(content)}</div>`);
-const ttsBtn = role === 'assistant' ? `<button class="mxb tts-btn" data-tts="true" title="朗读" style="opacity:0.5">🔊</button>` : '';
-div.innerHTML = `<div class="ma">${role==='user'?'👤':'🤖'}</div><div class="mw"><div class="mm">${nm}</div><div class="mc">${ct}</div></div><div class="mx">${ttsBtn}<button class="mxb" onclick="cpMsg(this)">📋</button>${role==='assistant'?`<button class="mxb" onclick="regen()">🔄</button>`:''}<button class="mxb" onclick="editMsg()">✏️</button><button class="mxb del" onclick="delSingleMsg()">🗑️</button></div>`;
-safeAppend(box, div); stBot(); return div;
+    const box = $('msgs'); if(box) { const wel = box.querySelector('.wel'); if(wel) wel.remove(); }
+    const div = document.createElement('div'); div.className = `msg ${role==='user'?'u':'ai'}${stream&&cfg.tTypingAnim?' msg-streaming':''}`;
+    const nm = role==='user' ? cfg.user : cfg.ai; 
+    let ct = stream && cfg.tTypingAnim ? '<div class="mt"><span class="typing-content"></span><span class="typing-cursor '+cfg.cursorStyle+'"></span></div>' : (cfg.tMd ? `<div class="mt">${rMd(content)}</div>` : `<div class="mt">${esc(content)}</div>`);
+    const ttsBtn = role === 'assistant' ? `<button class="mxb tts-btn" data-tts="true" title="朗读" style="opacity:0.5">🔊</button>` : '';
+    div.innerHTML = `<div class="ma">${role==='user'?'👤':'🤖'}</div><div class="mw"><div class="mm">${nm}</div><div class="mc">${ct}</div></div><div class="mx">${ttsBtn}<button class="mxb" onclick="cpMsg(this)">📋</button>${role==='assistant'?`<button class="mxb" onclick="regen()">🔄</button>`:''}<button class="mxb" onclick="editMsg()">✏️</button><button class="mxb del" onclick="delSingleMsg()">🗑️</button></div>`; 
+    safeAppend(box, div); stBot(); return div;
 }
 function cpMsg(btn, idx) { const s = sess.find(x=>x.id===cur); if(!s||!s.msgs[idx]) return; navigator.clipboard.writeText(s.msgs[idx].content).then(()=>{btn.textContent='✅';setTimeout(()=>btn.textContent='📋',1500)}).catch(()=>toast('复制失败','e')); }
 function regen() { const s = sess.find(x=>x.id===cur); if(s&&s.msgs.length&&s.msgs[s.msgs.length-1].role==='assistant'){ s.msgs.pop(); saveS(); rMsgs(); qSend(s.msgs[s.msgs.length-1]?.content||''); } }
-function editMsg(idx) {
-const s = sess.find(x=>x.id===cur);
-if(!s||!s.msgs[idx]) return;
-editMsgIdx = idx;
-$('editMsgContent').value = s.msgs[idx].content;
-$('editMsgModal').classList.add('act');
-setTimeout(()=>$('editMsgContent').focus(), 100);
+
+function editMsg(idx) { 
+    const s = sess.find(x=>x.id===cur); 
+    if(!s||!s.msgs[idx]) return; 
+    editMsgIdx = idx;
+    $('editMsgContent').value = s.msgs[idx].content;
+    $('editMsgModal').classList.add('act');
+    setTimeout(()=>$('editMsgContent').focus(), 100);
 }
 function closeEditModal() { $('editMsgModal').classList.remove('act'); editMsgIdx = null; }
 function confirmEditMsg() {
-if(editMsgIdx === null) return;
-const s = sess.find(x=>x.id===cur);
-const newContent = $('editMsgContent').value.trim();
-if(!newContent) { toast('内容不能为空','w'); return; }
-s.msgs[editMsgIdx].content = newContent;
-saveS(); rMsgs(); closeEditModal();
-toast('已更新','s'); logActivity('edit',`编辑消息 #${editMsgIdx+1}`,'s');
+    if(editMsgIdx === null) return;
+    const s = sess.find(x=>x.id===cur);
+    const newContent = $('editMsgContent').value.trim();
+    if(!newContent) { toast('内容不能为空','w'); return; }
+    s.msgs[editMsgIdx].content = newContent;
+    saveS(); rMsgs(); closeEditModal();
+    toast('已更新','s'); logActivity('edit',`编辑消息 #${editMsgIdx+1}`,'s');
 }
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && $('editMsgModal').classList.contains('act')) closeEditModal(); });
+
 function delSingleMsg(idx) {
-const s = sess.find(x=>x.id===cur);
-if(!s||!s.msgs[idx]) return;
-if(!confirm('确定删除这条消息？')) return;
-s.msgs.splice(idx,1);
-saveS(); rMsgs();
-toast('已删除','s'); logActivity('delete',`删除消息 #${idx+1}`,'s');
+    const s = sess.find(x=>x.id===cur);
+    if(!s||!s.msgs[idx]) return;
+    if(!confirm('确定删除这条消息？')) return;
+    s.msgs.splice(idx,1);
+    saveS(); rMsgs();
+    toast('已删除','s'); logActivity('delete',`删除消息 #${idx+1}`,'s');
 }
+
 // ✨ 流式输出优化
 function typeWriter(element, text, callback) {
-if(!cfg.tTypingAnim || !cfg.tStr) { element.innerHTML = cfg.tMd ? rMd(text) : esc(text); if(callback) callback(); return; }
-const contentEl = element.querySelector('.typing-content');
-const cursorEl = element.querySelector('.typing-cursor');
-if(!contentEl || !cursorEl) return;
-let i = 0, fullText = '';
-const speed = cfg.typingSpeed || 15;
-function type() {
-if(i < text.length) {
-fullText += text[i];
-contentEl.innerHTML = cfg.tMd ? rMd(fullText) : esc(fullText);
-i++; typingTimer = setTimeout(type, speed); stBot();
-} else {
-cursorEl.remove(); element.classList.remove('msg-streaming');
-element.querySelector('.mc').innerHTML = cfg.tMd ? rMd(text) : esc(text);
-if(callback) callback();
-if(cfg.ttsEnabled) speak(text, element.querySelector('.tts-btn'));
-if(cfg.tNotifySound) { const audio = new Audio(); audio.src = "data:audio/wav;base64,UklGRl9vT19teleport"; audio.play().catch(()=>{}); }
+    if(!cfg.tTypingAnim || !cfg.tStr) { element.innerHTML = cfg.tMd ? rMd(text) : esc(text); if(callback) callback(); return; }
+    const contentEl = element.querySelector('.typing-content');
+    const cursorEl = element.querySelector('.typing-cursor');
+    if(!contentEl || !cursorEl) return;
+    let i = 0, fullText = '';
+    const speed = cfg.typingSpeed || 15;
+    function type() {
+        if(i < text.length) {
+            fullText += text[i];
+            contentEl.innerHTML = cfg.tMd ? rMd(fullText) : esc(fullText);
+            i++; typingTimer = setTimeout(type, speed); stBot();
+        } else {
+            cursorEl.remove(); element.classList.remove('msg-streaming');
+            element.querySelector('.mc').innerHTML = cfg.tMd ? rMd(text) : esc(text);
+            if(callback) callback();
+            if(cfg.ttsEnabled) speak(text, element.querySelector('.tts-btn'));
+            if(cfg.tNotifySound) { const audio = new Audio(); audio.src = "data:audio/wav;base64,UklGRl9vT19teleport"; audio.play().catch(()=>{}); }
+        }
+    }
+    type();
 }
-}
-type();
-}
+
 // ============ 主发送函数 ============
 async function send() {
-const inp = $('userInput'), txt = inp.value.trim(); if(!txt || isStr) return;
-const c = await saveCfg();
-if(!c.apiUrl || !c.apiKey) { openSet(); swTab('api', document.querySelectorAll('.mtab')[0]); toast('请先配置AI API','w'); return; }
-if(!chkLim(txt, c)) return;
-const s = sess.find(x=>x.id===cur);
-if(s.msgs.length >= c.mTur*2) { toast('已达最大轮数','w'); return; }
-let autoAppended = false;
-if (SearchEngine.shouldAutoSearch(txt, c) && c.searchProvider && !pendingSearch) {
-try {
-$('searchBtn').disabled = true;
-const results = await SearchEngine.search(txt, c);
-if(Array.isArray(results) && results.length) {
-const append = SearchEngine.formatPromptAppend(results, txt, cfg.tSearchSafe);
-s.msgs.push({ role:'user', content: txt + append, rawResults: results });
-addMsg('ai', '', true); autoAppended = true;
-toast(`🔍 自动搜索 ${results.length} 条结果`, 's'); logActivity('search', `自动: ${txt} → ${results.length}`, 's');
+    const inp = $('userInput'), txt = inp.value.trim(); if(!txt || isStr) return;
+    const c = await saveCfg();
+    if(!c.apiUrl || !c.apiKey) { openSet(); swTab('api', document.querySelectorAll('.mtab')[0]); toast('请先配置AI API','w'); return; }
+    if(!chkLim(txt, c)) return;
+    const s = sess.find(x=>x.id===cur);
+    if(s.msgs.length >= c.mTur*2) { toast('已达最大轮数','w'); return; }
+    let autoAppended = false;
+    if (SearchEngine.shouldAutoSearch(txt, c) && c.searchProvider && !pendingSearch) {
+        try {
+            $('searchBtn').disabled = true;
+            const results = await SearchEngine.search(txt, c);
+            if(Array.isArray(results) && results.length) {
+                const append = SearchEngine.formatPromptAppend(results, txt, cfg.tSearchSafe);
+                s.msgs.push({ role:'user', content: txt + append, rawResults: results });
+                addMsg('ai', '', true); autoAppended = true;
+                toast(`🔍 自动搜索 ${results.length} 条结果`, 's'); logActivity('search', `自动: ${txt} → ${results.length}`, 's');
+            }
+        } catch(e) { toast('自动搜索失败: '+e.message, 'w'); logActivity('search', '自动搜索失败', 'w'); }
+        finally { $('searchBtn').disabled = false; }
+    }
+    let finalContent = txt;
+    if(pendingSearch && Array.isArray(pendingSearch.results) && pendingSearch.results.length > 0) {
+        const append = SearchEngine.formatPromptAppend(pendingSearch.results, pendingSearch.query, cfg.tSearchSafe);
+        finalContent = pendingSearch.query + append;
+        s.msgs.push({ role:'user', content: finalContent, rawResults: pendingSearch.results });
+        pendingSearch = null; SearchUI.clear();
+    } else if(!autoAppended) {
+        s.msgs.push({role:'user', content: finalContent});
+        $('userInput').value = ''; aRes(inp); 
+    }
+    if(s.msgs.length===1) s.title = (pendingSearch?.query||txt).slice(0,30);
+    st.today++; st.total++; saveSt(); rList();
+    isStr = true; $('sbtn').disabled = true; $('stbtn').style.display = 'block';
+    const typEl = autoAppended ? document.querySelectorAll('.msg.ai .mt').pop() : addMsg('ai','',true)?.querySelector('.mt');
+    const start = Date.now(); logActivity('request',`POST /chat [${c.cMod||c.mSel}]`,'w');
+    try {
+        const reply = await callApi(c, s, typEl);
+        UsageTracker.track('api', { in: txt.length, out: reply.length, latency: Date.now()-start });
+        const duration = Date.now() - start; s.msgs.push({role:'assistant', content:reply});
+        logActivity('response',`OK ${duration}ms | ${reply.length}字符`,'s');
+        if(cfg.ttsEnabled) speak(reply, null);
+    } catch(e) { const duration = Date.now() - start; if(e.name!=='AbortError') { s.msgs.push({role:'assistant', content:`❌ 请求失败: ${esc(e.message)}`}); toast(e.message, 'e'); logActivity('error',e.message,'e'); } else logActivity('abort','请求已取消','w'); }
+    isStr = false; $('sbtn').disabled = false; $('stbtn').style.display = 'none'; await saveS(); rMsgs();
 }
-} catch(e) { toast('自动搜索失败: '+e.message, 'w'); logActivity('search', '自动搜索失败', 'w'); }
-finally { $('searchBtn').disabled = false; }
-}
-let finalContent = txt;
-if(pendingSearch && Array.isArray(pendingSearch.results) && pendingSearch.results.length > 0) {
-const append = SearchEngine.formatPromptAppend(pendingSearch.results, pendingSearch.query, cfg.tSearchSafe);
-finalContent = pendingSearch.query + append;
-s.msgs.push({ role:'user', content: finalContent, rawResults: pendingSearch.results });
-pendingSearch = null; SearchUI.clear();
-} else if(!autoAppended) {
-s.msgs.push({role:'user', content: finalContent});
-$('userInput').value = ''; aRes(inp);
-}
-if(s.msgs.length===1) s.title = (pendingSearch?.query||txt).slice(0,30);
-st.today++; st.total++; saveSt(); rList();
-isStr = true; $('sbtn').disabled = true; $('stbtn').style.display = 'block';
-const typEl = autoAppended ? document.querySelectorAll('.msg.ai .mt').pop() : addMsg('ai','',true)?.querySelector('.mt');
-const start = Date.now(); logActivity('request',`POST /chat [${c.cMod||c.mSel}]`,'w');
-try {
-const reply = await callApi(c, s, typEl);
-UsageTracker.track('api', { in: txt.length, out: reply.length, latency: Date.now()-start });
-const duration = Date.now() - start; s.msgs.push({role:'assistant', content:reply});
-logActivity('response',`OK ${duration}ms | ${reply.length}字符`,'s');
-if(cfg.ttsEnabled) speak(reply, null);
-} catch(e) { const duration = Date.now() - start; if(e.name!=='AbortError') { s.msgs.push({role:'assistant', content:`❌ 请求失败: ${esc(e.message)}`}); toast(e.message, 'e'); logActivity('error',e.message,'e'); } else logActivity('abort','请求已取消','w'); }
-isStr = false; $('sbtn').disabled = false; $('stbtn').style.display = 'none'; await saveS(); rMsgs();
-}
+
 // ============ API 调用 ============
 async function callApi(c, s, streamEl) {
-abort = new AbortController(); const tid = setTimeout(()=>abort?.abort(), n(c.aTime,60)*1000);
-const msgs = [{role:'system', content:c.sP||''}];
-const ctx = s.msgs.slice(-20); msgs.push(...ctx);
-const body = { model: c.cMod || c.mSel || 'gpt-4o', messages: msgs, max_tokens: n(c.mTok,4096), temperature: n(c.temp,0.7), top_p: n(c.tp,0.9), frequency_penalty: n(c.fp,0), presence_penalty: n(c.pp,0), stream: !!c.tStr };
-if(c.cMod?.startsWith('o1')) { delete body.stream; delete body.max_tokens; delete body.temperature; delete body.top_p; delete body.frequency_penalty; delete body.presence_penalty; }
-let h = {'Content-Type':'application/json','Authorization':`Bearer ${c.apiKey}`}; try { Object.assign(h, JSON.parse(c.cH||'{}')); } catch(e) {}
-const url = c.apiUrl.replace(/\/+$/,'') + '/chat/completions'; let res;
-try { res = await fetch(url, {method:'POST',headers:h,body:JSON.stringify(body),signal:abort.signal,mode:'cors'}); } catch(e) { clearTimeout(tid); throw new Error('网络请求失败: '+e.message); }
-if(!res.ok) { clearTimeout(tid); const d = await res.json().catch(()=>({})); throw new Error(d.error?.message || `HTTP ${res.status}`); }
-clearTimeout(tid); return c.tStr ? hStr(res, c, streamEl) : (await res.json()).choices?.[0]?.message?.content || '无回复';
+    abort = new AbortController(); const tid = setTimeout(()=>abort?.abort(), n(c.aTime,60)*1000);
+    const msgs = [{role:'system', content:c.sP||''}];
+    const ctx = s.msgs.slice(-20); msgs.push(...ctx);
+    const body = { model: c.cMod || c.mSel || 'gpt-4o', messages: msgs, max_tokens: n(c.mTok,4096), temperature: n(c.temp,0.7), top_p: n(c.tp,0.9), frequency_penalty: n(c.fp,0), presence_penalty: n(c.pp,0), stream: !!c.tStr };
+    if(c.cMod?.startsWith('o1')) { delete body.stream; delete body.max_tokens; delete body.temperature; delete body.top_p; delete body.frequency_penalty; delete body.presence_penalty; }
+    let h = {'Content-Type':'application/json','Authorization':`Bearer ${c.apiKey}`}; try { Object.assign(h, JSON.parse(c.cH||'{}')); } catch(e) {}
+    const url = c.apiUrl.replace(/\/+$/,'') + '/chat/completions'; let res;
+    try { res = await fetch(url, {method:'POST',headers:h,body:JSON.stringify(body),signal:abort.signal,mode:'cors'}); } catch(e) { clearTimeout(tid); throw new Error('网络请求失败: '+e.message); }
+    if(!res.ok) { clearTimeout(tid); const d = await res.json().catch(()=>({})); throw new Error(d.error?.message || `HTTP ${res.status}`); }
+    clearTimeout(tid); return c.tStr ? hStr(res, c, streamEl) : (await res.json()).choices?.[0]?.message?.content || '无回复';
 }
 async function hStr(res, c, el) {
-const reader = res.body.getReader(); const dec = new TextDecoder(); let full='', buffer='';
-currentStreamEl = el;
-try {
-while(true) {
-const {done, value} = await reader.read();
-if(done) break;
-buffer += dec.decode(value, {stream:true});
-const lines = buffer.split('
-');
-buffer = lines.pop()||'';
-for(const line of lines) {
-const t = line.trim();
-if(!t.startsWith('data: ')) continue;
-const ds = t.slice(6);
-if(ds==='[DONE]') {
-if(cfg.tTypingAnim && el) {
-const contentEl = el.querySelector('.typing-content'); const cursorEl = el.querySelector('.typing-cursor');
-if(contentEl && cursorEl) { cursorEl.remove(); el.classList.remove('msg-streaming'); el.querySelector('.mc').innerHTML = cfg.tMd ? rMd(full) : esc(full); }
+    const reader = res.body.getReader(); const dec = new TextDecoder(); let full='', buffer='';
+    currentStreamEl = el;
+    try { 
+        while(true) { 
+            const {done, value} = await reader.read(); 
+            if(done) break; 
+            buffer += dec.decode(value, {stream:true}); 
+            const lines = buffer.split('\n'); 
+            buffer = lines.pop()||''; 
+            for(const line of lines) { 
+                const t = line.trim(); 
+                if(!t.startsWith('data: ')) continue; 
+                const ds = t.slice(6); 
+                if(ds==='[DONE]') {
+                    if(cfg.tTypingAnim && el) {
+                        const contentEl = el.querySelector('.typing-content'); const cursorEl = el.querySelector('.typing-cursor');
+                        if(contentEl && cursorEl) { cursorEl.remove(); el.classList.remove('msg-streaming'); el.querySelector('.mc').innerHTML = cfg.tMd ? rMd(full) : esc(full); }
+                    }
+                    if(cfg.ttsEnabled) speak(full, el?.querySelector('.tts-btn'));
+                    return full;
+                }
+                try { 
+                    const p = JSON.parse(ds); const dc = p.choices?.[0]?.delta?.content; 
+                    if(dc) { 
+                        full += dc; 
+                        if(el && cfg.tTypingAnim) { const contentEl = el.querySelector('.typing-content'); if(contentEl) { contentEl.innerHTML = cfg.tMd ? rMd(full) : esc(full); stBot(); } } 
+                        else if(el) { el.innerHTML = cfg.tMd ? rMd(full) : esc(full); stBot(); }
+                    } 
+                } catch(e) {} 
+            } 
+        } 
+    } catch(e) { 
+        if(full.length===0) throw new Error('流式传输中断: '+(e.message||'未知')); 
+        if(el && cfg.tTypingAnim) { const contentEl = el.querySelector('.typing-content'); const cursorEl = el.querySelector('.typing-cursor'); if(contentEl && cursorEl) { cursorEl.remove(); el.classList.remove('msg-streaming'); el.querySelector('.mc').innerHTML = cfg.tMd ? rMd(full) : esc(full); } }
+    } finally { try{reader.releaseLock()}catch(e){} currentStreamEl = null; } 
+    return full || (full.length>0 ? '' : '⚠️ 输出中断');
 }
-if(cfg.ttsEnabled) speak(full, el?.querySelector('.tts-btn'));
-return full;
-}
-try {
-const p = JSON.parse(ds); const dc = p.choices?.[0]?.delta?.content;
-if(dc) {
-full += dc;
-if(el && cfg.tTypingAnim) { const contentEl = el.querySelector('.typing-content'); if(contentEl) { contentEl.innerHTML = cfg.tMd ? rMd(full) : esc(full); stBot(); } }
-else if(el) { el.innerHTML = cfg.tMd ? rMd(full) : esc(full); stBot(); }
-}
-} catch(e) {}
-}
-}
-} catch(e) {
-if(full.length===0) throw new Error('流式传输中断: '+(e.message||'未知'));
-if(el && cfg.tTypingAnim) { const contentEl = el.querySelector('.typing-content'); const cursorEl = el.querySelector('.typing-cursor'); if(contentEl && cursorEl) { cursorEl.remove(); el.classList.remove('msg-streaming'); el.querySelector('.mc').innerHTML = cfg.tMd ? rMd(full) : esc(full); } }
-} finally { try{reader.releaseLock()}catch(e){} currentStreamEl = null; }
-return full || (full.length>0 ? '' : '⚠️ 输出中断');
-}
+
 // ============ 限制检查 ============
-function chkLim(txt, c) { if(txt.length > n(c.mIn,4000)) { toast(`超过最大字符(${n(c.mIn,4000)})`, 'e'); return false; } if(n(c.dLim,100)>0 && st.today >= n(c.dLim,100)) { toast('今日请求已达上限', 'e'); return false; } if(n(c.rLim,20)>0) { const now=Date.now(); rT=rT.filter(t=>now-t<60000); if(rT.length>=n(c.rLim,20)) { toast('请求过于频繁', 'e'); return false; } rT.push(now); } if(c.tSens===true) { const ws=(c.sW||'').split('
-').map(w=>w.trim()).filter(Boolean); if(ws.some(w=>txt.toLowerCase().includes(w.toLowerCase()))) { toast('包含敏感词', 'e'); return false; } } if(c.tTime===true) { const m=new Date().getHours()*60+new Date().getMinutes(); const[sh,sm]=c.tS.split(':').map(Number),[eh,em]=c.tE.split(':').map(Number); const s=sh*60+sm, e=eh*60+em; if((s<e&&(m<s||m>e))||(s>e&&m<s&&m>e)) { toast('不在允许使用时间内', 'e'); return false; } } return true; }
+function chkLim(txt, c) { if(txt.length > n(c.mIn,4000)) { toast(`超过最大字符(${n(c.mIn,4000)})`, 'e'); return false; } if(n(c.dLim,100)>0 && st.today >= n(c.dLim,100)) { toast('今日请求已达上限', 'e'); return false; } if(n(c.rLim,20)>0) { const now=Date.now(); rT=rT.filter(t=>now-t<60000); if(rT.length>=n(c.rLim,20)) { toast('请求过于频繁', 'e'); return false; } rT.push(now); } if(c.tSens===true) { const ws=(c.sW||'').split('\n').map(w=>w.trim()).filter(Boolean); if(ws.some(w=>txt.toLowerCase().includes(w.toLowerCase()))) { toast('包含敏感词', 'e'); return false; } } if(c.tTime===true) { const m=new Date().getHours()*60+new Date().getMinutes(); const[sh,sm]=c.tS.split(':').map(Number),[eh,em]=c.tE.split(':').map(Number); const s=sh*60+sm, e=eh*60+em; if((s<e&&(m<s||m>e))||(s>e&&m<s&&m>e)) { toast('不在允许使用时间内', 'e'); return false; } } return true; }
+
 // ============ 交互函数 ============
 function hKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()} }
 function aRes(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; $('cc').textContent=`${el.value.length} / ${n(cfg.mIn,4000)}`; }
 function stBot() { const m=$('msgs'); if(m) setTimeout(()=>m.scrollTop=m.scrollHeight, 30); }
-function stop() {
-abort?.abort(); if(typingTimer) clearTimeout(typingTimer); window.speechSynthesis.cancel();
-if(currentStreamEl && cfg.tTypingAnim) { const contentEl = currentStreamEl.querySelector('.typing-content'); const cursorEl = currentStreamEl.querySelector('.typing-cursor'); if(contentEl && cursorEl) { cursorEl.remove(); currentStreamEl.classList.remove('msg-streaming'); } }
-toast('已停止', 'w'); logActivity('abort','用户手动停止','w');
+function stop() { 
+    abort?.abort(); if(typingTimer) clearTimeout(typingTimer); window.speechSynthesis.cancel();
+    if(currentStreamEl && cfg.tTypingAnim) { const contentEl = currentStreamEl.querySelector('.typing-content'); const cursorEl = currentStreamEl.querySelector('.typing-cursor'); if(contentEl && cursorEl) { cursorEl.remove(); currentStreamEl.classList.remove('msg-streaming'); } }
+    toast('已停止', 'w'); logActivity('abort','用户手动停止','w'); 
 }
 function qSend(t) { $('userInput').value=t; send(); }
 function newChat() { const s={id:Date.now().toString(),title:'新对话',msgs:[],created:new Date().toLocaleString(),tags:[]}; sess.unshift(s); cur=s.id; saveS(); rList(); rMsgs(); $('sidebar').classList.remove('open'); }
@@ -1377,10 +1319,10 @@ async function saveS() { if(cfg.encrypted && encryptPwd) { await saveEncrypted('
 function clrCur() { const s=sess.find(x=>x.id===cur); if(s){s.msgs=[];saveS();rMsgs();toast('已清空','s')} }
 function togSide() { $('sidebar').classList.toggle('open'); }
 function toggleSidebarCollapse() {
-sidebarCollapsed = !sidebarCollapsed;
-const sb = $('sidebar'); const toggle = sb.querySelector('.sidebar-toggle');
-if(sidebarCollapsed) { sb.classList.add('collapsed'); toggle.innerHTML = '▶'; toggle.style.right = '0'; toggle.style.borderRadius = '0 0 0 8px'; }
-else { sb.classList.remove('collapsed'); toggle.innerHTML = '◀'; toggle.style.right = '-12px'; toggle.style.borderRadius = '0 8px 8px 0'; }
+    sidebarCollapsed = !sidebarCollapsed;
+    const sb = $('sidebar'); const toggle = sb.querySelector('.sidebar-toggle');
+    if(sidebarCollapsed) { sb.classList.add('collapsed'); toggle.innerHTML = '▶'; toggle.style.right = '0'; toggle.style.borderRadius = '0 0 0 8px'; } 
+    else { sb.classList.remove('collapsed'); toggle.innerHTML = '◀'; toggle.style.right = '-12px'; toggle.style.borderRadius = '0 8px 8px 0'; }
 }
 function openSet() { $('setMod').classList.add('act'); saveCfg(); }
 function closeSet() { saveCfg(); applyUI(); $('setMod').classList.remove('act'); }
@@ -1390,26 +1332,24 @@ function aF(f) { cfg.fFam=f; applyUI(); }
 function aFS(s) { cfg.fSiz=s; applyUI(); $('fSizV').textContent=s+'px'; $('fSizR').textContent=s; }
 function aR(r) { cfg.mRad=r; applyUI(); $('rRadV').textContent=r+'px'; $('rRadR').textContent=r; }
 function togComp(el) { el.classList.toggle('act'); applyUI(); }
+
 // 🔧 修复: saveSt 函数添加空值检查，避免元素不存在时报错
-function saveSt() {
-localStorage.setItem('uaic_st', JSON.stringify(st));
-if($('tReq')) $('tReq').textContent = st.today;
-if($('tMsg')) $('tMsg').textContent = st.total;
+function saveSt() { 
+    localStorage.setItem('uaic_st', JSON.stringify(st)); 
+    if($('tReq')) $('tReq').textContent = st.today; 
+    if($('tMsg')) $('tMsg').textContent = st.total; 
 }
+
 function toast(msg, type='i') { const c = $('tcon'); if(!c) return; const t = document.createElement('div'); t.className = `tst ${type==='s'?'s':type==='e'?'e':'w'}`; t.innerHTML = `<span>${type==='s'?'✅':type==='e'?'❌':'⚠️'}</span><span>${esc(msg)}</span>`; c.appendChild(t); setTimeout(()=>t.remove(), 3500); }
 async function testApi() { const c = await saveCfg(); if(!c.apiUrl || !c.apiKey) { toast('请填写AI API', 'w'); return; } toast('测试中...', 'i'); try { const h = {'Content-Type':'application/json','Authorization':`Bearer ${c.apiKey}`}; const r = await fetch(c.apiUrl.replace(/\/+$/,'')+'/chat/completions', {method:'POST',headers:h,body:JSON.stringify({model:c.cMod||'gpt-4o-mini',messages:[{role:'user',content:'hi'}],max_tokens:10}),mode:'cors'}); if(!r.ok) throw new Error(`HTTP ${r.status}`); $('sdot').className = 'sd'; toast('AI API 连接成功', 's'); logActivity('api','连接成功','s'); } catch(e) { $('sdot').className = 'sd err'; toast(e.message, 'e'); logActivity('api',e.message,'e'); } }
 async function testSearch() { const c = await saveCfg(); if(!c.searchProvider) { toast('请选择搜索服务', 'w'); return; } toast('测试搜索中...', 'i'); try { const res = await SearchEngine.search('test', c); toast(`搜索成功: ${res.length} 条结果`, 's'); logActivity('search','测试成功','s'); } catch(e) { toast('搜索失败: '+e.message, 'e'); logActivity('search',e.message,'e'); } }
 async function manualSearch() { const t = $('userInput').value.trim(); if(!t) { toast('先输入搜索内容', 'w'); return; } await SearchUI.start(t); }
-function expChat() { const s = sess.find(x=>x.id===cur); if(!s||!s.msgs.length) { toast('空对话', 'w'); return; } let md = `# ${s.title}
-`; s.msgs.forEach(m=>{ const ct = Array.isArray(m.content) ? m.content.filter(c=>c.type==='text').map(c=>c.text).join('
-') : m.content; md += `## ${m.role==='user'?'👤 用户':'🤖 AI'}
-${ct}
----
-`; }); const b = new Blob([md], {type:'text/markdown'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${s.title}_${new Date().toLocaleDateString()}.md`; a.click(); toast('已导出', 's'); }
+function expChat() { const s = sess.find(x=>x.id===cur); if(!s||!s.msgs.length) { toast('空对话', 'w'); return; } let md = `# ${s.title}\n\n`; s.msgs.forEach(m=>{ const ct = Array.isArray(m.content) ? m.content.filter(c=>c.type==='text').map(c=>c.text).join('\n') : m.content; md += `## ${m.role==='user'?'👤 用户':'🤖 AI'}\n\n${ct}\n\n---\n\n`; }); const b = new Blob([md], {type:'text/markdown'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${s.title}_${new Date().toLocaleDateString()}.md`; a.click(); toast('已导出', 's'); }
 function expAll() { const backup = { sess, cfg, st, activity, library: cfg.library, time: new Date().toISOString() }; const b = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `uaic_backup_${new Date().toISOString().split('T')[0]}.json`; a.click(); toast('导出成功','s'); }
 async function impData(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async ev => { try { const data = JSON.parse(ev.target.result); if(cfg.encrypted && encryptPwd) { if(data.sess) await saveEncrypted('uaic_sess', data.sess, encryptPwd); if(data.cfg) await saveEncrypted('uaic_cfg', {...DEF,...data.cfg}, encryptPwd); } else { if(data.sess) { sess=data.sess; localStorage.setItem('uaic_sess', JSON.stringify(sess)); } if(data.cfg) localStorage.setItem('uaic_cfg',JSON.stringify({...DEF,...data.cfg})); if(data.library) { cfg.library=data.library; localStorage.setItem('uaic_lib', JSON.stringify(data.library)); } } if(!sess.length) newChat(); else { cur=sess[0].id; } await loadCfg(); rList(); rMsgs(); renderLibrary(); toast('导入成功', 's'); } catch { toast('无效文件', 'e'); } }; r.readAsText(f); }
 function reset() { if(confirm('确定重置所有数据？不可撤销！')) { localStorage.clear(); location.reload(); } }
 function toggleSearchConfig() { const val = $('searchProvider').value; $('searchConfig').style.display = val ? 'block' : 'none'; $('customSearchBox').style.display = val === 'custom' ? 'block' : 'none'; }
+
 // 📚 库功能
 function openLibrary() { renderLibrary(); $('libraryModal').classList.add('act'); }
 function closeLibrary() { $('libraryModal').classList.remove('act'); }
@@ -1418,46 +1358,67 @@ function renderLibrary() { const grid = $('libraryContent'); const empty = $('li
 function updateLibTitle(id, newTitle) { const item = cfg.library.find(x=>x.id===id); if(item) { item.title = newTitle.trim()||'未命名'; saveCfg(); toast('标题已更新','s'); } }
 function deleteLibItem(id) { if(!confirm('确定删除此备份？')) return; cfg.library = cfg.library.filter(x=>x.id!==id); saveCfg(); renderLibrary(); toast('已删除','s'); }
 function copyLibItem(id) { const item = cfg.library.find(x=>x.id===id); if(item) { navigator.clipboard.writeText(item.content).then(()=>toast('已复制到剪贴板','s')); } }
-// 📢 公告加载已移至 载入.js，请确保该文件与 index.html 同目录
+
+// 📢 Gitee 公告获取 - 使用固定配置，禁止修改
+async function fetchAnnouncement() {
+    // 🔒 固定配置，不可修改
+    const ANN_URL = "https://github.com/GameYellowBox/Test/blob/main/%E5%85%AC%E5%91%8A.md";
+    
+    toast('正在获取公告...', 'i');
+    try {
+        const res = await fetch(ANN_URL, { headers: { 'Accept': 'application/json' } });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const raw = decodeURIComponent(escape(window.atob(data.content)));
+        const html = marked.parse(raw);
+        $('annContent').innerHTML = html;
+        $('annModal').classList.add('act');
+        toast('公告加载成功', 's');
+    } catch(e) {
+        toast('获取公告失败: ' + e.message, 'e');
+        $('annContent').innerHTML = `<div style="color:var(--err);padding:20px;text-align:center">⚠️ 加载失败<br><small>${esc(e.message)}</small></div>`;
+        $('annModal').classList.add('act');
+    }
+}
+
 // 粒子背景 & 错误处理 & 初始化
 (function(){const c=document.getElementById('particles'),ctx=c.getContext('2d');let w,h,pts=[];const rs=()=>{w=c.width=innerWidth;h=c.height=innerHeight};rs();addEventListener('resize',rs);for(let i=0;i<40;i++)pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,r:Math.random()*1.5+0.5,a:Math.random()*0.3+0.05});const dr=()=>{ctx.clearRect(0,0,w,h);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(99,102,241,${p.a})`;ctx.fill();for(let j=pts.indexOf(p)+1;j<pts.length;j++){const dx=p.x-pts[j].x,dy=p.y-pts[j].y,d=Math.hypot(dx,dy);if(d<100){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(99,102,241,${0.1*(1-d/100)})`;ctx.stroke()}}});requestAnimationFrame(dr)};dr()})();
 window.onerror = function(m,u,l,c,e) { if(window._errLock) return true; window._errLock=true; try{toast('系统异常: '+m,'e');logActivity('error',m,'e')}catch{} setTimeout(()=>window._errLock=false,1000); return true; };
 window.addEventListener('DOMContentLoaded', async () => { await loadCfg(); if(!sess.length) newChat(); else swSess(cur||sess[0].id); saveSt(); UsageTracker.init(); updateModelCaps(); loadVoices(); if('ontouchstart' in window) { document.body.classList.add('touch'); let lastTouchEnd = 0; document.addEventListener('touchend', (e) => { const now = Date.now(); if(now - lastTouchEnd <= 300) e.preventDefault(); lastTouchEnd = now; }, { passive: false }); } });
+
 // 📊 超详细用量追踪模块
 const UsageTracker = {
-data: { daily: {}, total: { calls:0, charsIn:0, charsOut:0, search:0, cache:0, tts:0, lib:0 }, pricing: { rate:0 } },
-init() { try { const s=localStorage.getItem('uaic_usage'); if(s) this.data=JSON.parse(s); } catch(e){} this.render(); },
-save() { localStorage.setItem('uaic_usage', JSON.stringify(this.data)); },
-track(t, m={}) {
-const d=new Date().toISOString().split('T')[0]; if(!this.data.daily[d]) this.data.daily[d]={calls:0,in:0,out:0,search:0,lat:[]};
-this.data.total.calls++; this.data.daily[d].calls++;
-if(m.in){this.data.total.charsIn+=m.in;this.data.daily[d].in+=m.in;}
-if(m.out){this.data.total.charsOut+=m.out;this.data.daily[d].out+=m.out;}
-if(m.search){this.data.total.search++;this.data.daily[d].search++;}
-if(m.cache) this.data.total.cache = m.cache;
-if(m.lat) this.data.daily[d].lat.push(m.lat);
-const k=Object.keys(this.data.daily); if(k.length>90) delete this.data.daily[k[0]];
-this.save(); this.render();
-},
-render() {
-const d=new Date().toISOString().split('T')[0], td=this.data.daily[d]||{calls:0,in:0,out:0,search:0,lat:[]}, t=this.data.total;
-const s=(i,v)=>{const e=$(i);if(e)e.textContent=v;};
-s('u-calls-t',t.calls); s('u-calls-d',td.calls); s('u-in',Math.round(t.charsIn/4)); s('u-out',Math.round(t.charsOut/4));
-s('u-tokens',Math.round((t.charsIn+t.charsOut)/4)); s('u-search',t.search); s('u-cache',t.cache);
-s('u-tts',t.tts); s('u-lib',t.lib); s('u-storage',(new Blob([JSON.stringify(localStorage)]).size/1024).toFixed(1)+' KB');
-s('u-enc',cfg.encrypted?'是':'否'); s('u-cost','$'+(((t.charsIn+t.charsOut)/4/1e6)*(this.data.pricing.rate||0)).toFixed(2));
-if($('costRate')) $('costRate').value=this.data.pricing.rate||0;
-// 渲染趋势图
-const c=$('u-chart'); if(!c) return; c.innerHTML=''; let mx=1; const ds=[];
-for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().split('T')[0];const v=this.data.daily[k]?.calls||0;ds.push({k,v});if(v>mx)mx=v;}
-ds.forEach((x,idx)=>{const h=Math.max(3,(x.v/mx)*55);const b=document.createElement('div');b.className='u-bar';b.style.height=h+'px';b.dataset.tip=`${x.k.slice(5)}: ${x.v}`;b.style.animationDelay=`${idx*0.04}s`;c.appendChild(b);});
-document.querySelectorAll('#t-usage .u-card').forEach((el,i)=>{el.classList.remove('act');void el.offsetWidth;el.style.animationDelay=`${i*0.05}s`;el.classList.add('act');});
-},
-updateRate() { this.data.pricing.rate=parseFloat($('costRate').value)||0; this.save(); this.render(); },
-exportCSV() { let c='Date,Calls,In_Chars,Out_Chars,Search,Avg_Latency
-'; Object.entries(this.data.daily).forEach(([k,v])=>{const a=v.lat.length?(v.lat.reduce((x,y)=>x+y,0)/v.lat.length).toFixed(1):0;c+=`${k},${v.calls},${v.in},${v.out},${v.search},${a}
-`;}); const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download=`uaic_usage_${new Date().toISOString().split('T')[0]}.csv`;a.click(); toast('已导出','s'); },
-clear() { if(!confirm('⚠️ 确定清空所有用量统计？')) return; this.data={daily:{},total:{calls:0,charsIn:0,charsOut:0,search:0,cache:0,tts:0,lib:0},pricing:this.data.pricing}; this.save(); this.render(); toast('已重置','s'); }
+  data: { daily: {}, total: { calls:0, charsIn:0, charsOut:0, search:0, cache:0, tts:0, lib:0 }, pricing: { rate:0 } },
+  init() { try { const s=localStorage.getItem('uaic_usage'); if(s) this.data=JSON.parse(s); } catch(e){} this.render(); },
+  save() { localStorage.setItem('uaic_usage', JSON.stringify(this.data)); },
+  track(t, m={}) {
+    const d=new Date().toISOString().split('T')[0]; if(!this.data.daily[d]) this.data.daily[d]={calls:0,in:0,out:0,search:0,lat:[]};
+    this.data.total.calls++; this.data.daily[d].calls++;
+    if(m.in){this.data.total.charsIn+=m.in;this.data.daily[d].in+=m.in;}
+    if(m.out){this.data.total.charsOut+=m.out;this.data.daily[d].out+=m.out;}
+    if(m.search){this.data.total.search++;this.data.daily[d].search++;}
+    if(m.cache) this.data.total.cache = m.cache;
+    if(m.lat) this.data.daily[d].lat.push(m.lat);
+    const k=Object.keys(this.data.daily); if(k.length>90) delete this.data.daily[k[0]];
+    this.save(); this.render();
+  },
+  render() {
+    const d=new Date().toISOString().split('T')[0], td=this.data.daily[d]||{calls:0,in:0,out:0,search:0,lat:[]}, t=this.data.total;
+    const s=(i,v)=>{const e=$(i);if(e)e.textContent=v;};
+    s('u-calls-t',t.calls); s('u-calls-d',td.calls); s('u-in',Math.round(t.charsIn/4)); s('u-out',Math.round(t.charsOut/4));
+    s('u-tokens',Math.round((t.charsIn+t.charsOut)/4)); s('u-search',t.search); s('u-cache',t.cache);
+    s('u-tts',t.tts); s('u-lib',t.lib); s('u-storage',(new Blob([JSON.stringify(localStorage)]).size/1024).toFixed(1)+' KB');
+    s('u-enc',cfg.encrypted?'是':'否'); s('u-cost','$'+(((t.charsIn+t.charsOut)/4/1e6)*(this.data.pricing.rate||0)).toFixed(2));
+    if($('costRate')) $('costRate').value=this.data.pricing.rate||0;
+    // 渲染趋势图
+    const c=$('u-chart'); if(!c) return; c.innerHTML=''; let mx=1; const ds=[];
+    for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const k=dt.toISOString().split('T')[0];const v=this.data.daily[k]?.calls||0;ds.push({k,v});if(v>mx)mx=v;}
+    ds.forEach((x,idx)=>{const h=Math.max(3,(x.v/mx)*55);const b=document.createElement('div');b.className='u-bar';b.style.height=h+'px';b.dataset.tip=`${x.k.slice(5)}: ${x.v}`;b.style.animationDelay=`${idx*0.04}s`;c.appendChild(b);});
+    document.querySelectorAll('#t-usage .u-card').forEach((el,i)=>{el.classList.remove('act');void el.offsetWidth;el.style.animationDelay=`${i*0.05}s`;el.classList.add('act');});
+  },
+  updateRate() { this.data.pricing.rate=parseFloat($('costRate').value)||0; this.save(); this.render(); },
+  exportCSV() { let c='Date,Calls,In_Chars,Out_Chars,Search,Avg_Latency\n'; Object.entries(this.data.daily).forEach(([k,v])=>{const a=v.lat.length?(v.lat.reduce((x,y)=>x+y,0)/v.lat.length).toFixed(1):0;c+=`${k},${v.calls},${v.in},${v.out},${v.search},${a}\n`;}); const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download=`uaic_usage_${new Date().toISOString().split('T')[0]}.csv`;a.click(); toast('已导出','s'); },
+  clear() { if(!confirm('⚠️ 确定清空所有用量统计？')) return; this.data={daily:{},total:{calls:0,charsIn:0,charsOut:0,search:0,cache:0,tts:0,lib:0},pricing:this.data.pricing}; this.save(); this.render(); toast('已重置','s'); }
 };
 </script>
 </body>
