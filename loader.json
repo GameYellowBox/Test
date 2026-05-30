@@ -1,0 +1,12 @@
+{
+  "announcement": {
+    "url": "https://yellow-box-12015.gitee.io/beta/公告.md",
+    "version": "1.2.0",
+    "fallback": "https://raw.githubusercontent.com/your/backup/main/公告.md",
+    "cache_ttl": 3600
+  },
+  "meta": {
+    "updated": "2024-06-01T12:00:00Z",
+    "author": "YellowBox"
+  }
+}
