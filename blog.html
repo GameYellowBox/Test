@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>博客列表</title>
+  <meta name="description" content="技术分享、设计心得与生活记录">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,34 +13,39 @@
       <a href="index.html" class="logo">🌿 我的主页</a>
       <div class="nav-links">
         <a href="index.html">首页</a>
-        <a href="blog.html" class="active">博客</a>
-        <a href="https://github.com" target="_blank">GitHub</a>
+        <a href="blog.html">博客</a>
+        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
         <button id="theme-toggle" class="theme-toggle">🌙 暗黑</button>
       </div>
     </nav>
 
     <main>
-      <h2 style="margin-bottom: 1.5rem; font-size: 1.8rem;">📝 最新文章</h2>
+      <h2 style="margin-bottom: 1.2rem; font-size: clamp(1.4rem, 3vw, 1.8rem);">📝 最新文章</h2>
       
-      <article class="card">
+      <div class="search-box">
+        <input type="search" id="blog-search" placeholder="🔍 搜索标题或标签...">
+      </div>
+
+      <article class="card article-card">
         <h2>第一篇：如何使用 GitHub Pages 搭建博客</h2>
-        <p>本文介绍从零开始创建仓库、编写静态页面、配置 Pages 服务的完整流程...</p>
-        <span class="meta">📅 2024-05-20 · 🏷️ 教程</span>
+        <p>本文介绍从零开始创建仓库、编写静态页面、配置 Pages 服务的完整流程。包含自定义域名、HTTPS 自动证书与部署优化技巧。</p>
+        <div class="meta"><span>📅 2024-05-20</span><span>🏷️ #教程 #GitHub</span></div>
         <a href="#" class="btn" style="margin-top:0.8rem;">阅读全文</a>
       </article>
 
-      <article class="card">
+      <article class="card article-card">
         <h2>第二篇：低饱和度 UI 设计心得</h2>
-        <p>降低色彩饱和度和对比度，不仅能让界面更耐看，还能减少视觉疲劳...</p>
-        <span class="meta">📅 2024-05-12 · 🏷️ 设计</span>
+        <p>降低色彩饱和度和对比度，不仅能让界面更耐看，还能有效减少长时间阅读的视觉疲劳。本文分享配色逻辑与实现方案。</p>
+        <div class="meta"><span>📅 2024-05-12</span><span>🏷️ #设计 #CSS</span></div>
         <a href="#" class="btn" style="margin-top:0.8rem;">阅读全文</a>
       </article>
 
-      <!-- 👇 评论区将显示在这里（需按下方教程配置 Giscus） -->
+      <!-- 💬 Giscus 评论区容器 -->
       <div class="card" style="margin-top: 2rem;">
         <h3>💬 评论区</h3>
-        <!-- 替换下方注释内容为 Giscus 脚本 -->
-        <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem;">配置完成后将自动加载评论区</p>
+        <p style="color:var(--text-secondary); font-size:0.9rem; margin:0.8rem 0;">配置完成后将自动加载。支持暗黑模式同步与 GitHub 登录。</p>
+        <!-- 将下方注释替换为 Giscus 生成的 <script> 标签 -->
+        <!-- <script src="https://giscus.app/client.js" data-repo="用户名/仓库" ... async></script> -->
       </div>
     </main>
 
@@ -47,6 +53,7 @@
       &copy; <span id="year"></span> 你的名字. 由 GitHub Pages 驱动。
     </footer>
   </div>
+  <button id="back-to-top" class="back-to-top" aria-label="返回顶部">↑</button>
   <script src="script.js"></script>
 </body>
 </html>
